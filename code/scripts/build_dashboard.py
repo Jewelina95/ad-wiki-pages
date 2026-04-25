@@ -93,6 +93,12 @@ PROJECT_PITCH = (
 
 CORE_ASSETS = [
     {
+        "name": "🧪 试用 Demo（上传患者数据）",
+        "desc": "拖拽 progression CSV → Agent 立刻基于 wiki KB 给分期 / 风险 / 推荐 → 带原始论文引用",
+        "link": "demo.html",
+        "tag": "现可用",
+    },
+    {
         "name": "专家知识库设计",
         "desc": "5 目录 / 7 段格式 / 医生可编辑的临床手册式 KB，已和临床团队对齐",
         "link": "wiki/synthesis/expert_kb_report.md",

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AD WIKI · Clinical Inference Demo</title>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4/papaparse.min.js"></script>
+<style>
+:root {
+  --bg: #fafaf9; --card: #ffffff; --text: #1c1917; --muted: #57534e;
+  --accent: #0f766e; --border: #e7e5e4;
+  --green: #16a34a; --yellow: #ca8a04; --orange: #ea580c; --red: #dc2626;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Helvetica, Arial, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.55;
+}
+.wrap { max-width: 980px; margin: 0 auto; padding: 32px 24px 80px; }
+header.hero {
+  background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+  color: #f0fdfa; padding: 40px 24px;
+}
+header.hero h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -0.02em; }
+header.hero p { margin: 0; max-width: 820px; font-size: 15px; opacity: 0.9; }
+header.hero a { color: #99f6e4; }
+h2 { font-size: 18px; margin: 32px 0 14px; letter-spacing: -0.01em; }
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 22px; margin-bottom: 16px;
+}
+#dropZone {
+  border: 2px dashed #cbd5e1; border-radius: 10px;
+  padding: 50px 24px; text-align: center; cursor: pointer;
+  transition: all 0.15s; background: #f8fafc;
+}
+#dropZone:hover, #dropZone.drag { border-color: var(--accent); background: #f0fdfa; }
+#dropZone .hint { color: var(--muted); font-size: 13px; margin-top: 8px; }
+#dropZone .icon { font-size: 32px; margin-bottom: 8px; }
+#fileInput { display: none; }
+button.primary {
+  background: var(--accent); color: white; border: 0;
+  padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s;
+}
+button.primary:hover { background: #115e59; }
+button.primary:disabled { background: #9ca3af; cursor: not-allowed; }
+button.ghost {
+  background: transparent; color: var(--accent); border: 1px solid var(--accent);
+  padding: 8px 16px; border-radius: 6px; font-size: 13px;
+  cursor: pointer; margin-left: 8px;
+}
+button.ghost:hover { background: #f0fdfa; }
+.config-row {
+  display: flex; align-items: center; gap: 12px; margin-top: 16px;
+  padding-top: 16px; border-top: 1px solid var(--border);
+}
+.config-row label { font-size: 13px; color: var(--muted); }
+.file-info {
+  background: #f0fdfa; border: 1px solid #99f6e4;
+  padding: 12px 16px; border-radius: 6px; font-size: 13px;
+  margin-top: 12px; display: none;
+}
+.file-info.show { display: block; }
+.file-info code { background: white; padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+#resultSection { display: none; }
+#resultSection.show { display: block; }
+.result-block {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px; margin-bottom: 14px;
+}
+.stage-bar {
+  display: flex; gap: 4px; margin: 12px 0; height: 28px;
+}
+.stage-cell {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: white;
+  border-radius: 4px; opacity: 0.3; transition: opacity 0.3s;
+}
+.stage-cell.active { opacity: 1; transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.confidence-bar {
+  height: 6px; background: var(--border); border-radius: 3px; margin: 8px 0;
+  overflow: hidden;
+}
+.confidence-bar > div { height: 100%; background: var(--accent); transition: width 0.5s; }
+.flag {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 12px; margin-bottom: 8px;
+  border-radius: 6px; font-size: 13px;
+}
+.flag.warn { background: #fef3c7; border: 1px solid #fde68a; color: #713f12; }
+.flag.danger { background: #fee2e2; border: 1px solid #fca5a5; color: #7f1d1d; }
+.flag.ok { background: #dcfce7; border: 1px solid #86efac; color: #14532d; }
+.flag-icon { font-size: 16px; line-height: 1.3; }
+.evidence {
+  font-size: 12px; padding: 10px 14px; border-left: 3px solid var(--accent);
+  background: #f0fdfa; margin-top: 8px; border-radius: 0 6px 6px 0;
+}
+.evidence a { color: var(--accent); text-decoration: none; }
+.evidence a:hover { text-decoration: underline; }
+.spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid #e5e5e5; border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.metric-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px; margin-top: 12px;
+}
+.metric-cell {
+  background: #fafaf9; border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px 14px;
+}
+.metric-cell .label { color: var(--muted); font-size: 11px; }
+.metric-cell .value { font-size: 18px; font-weight: 600; color: var(--text); }
+.metric-cell .delta { font-size: 11px; margin-top: 2px; }
+.metric-cell .delta.up { color: var(--red); }
+.metric-cell .delta.down { color: var(--green); }
+footer { margin-top: 40px; font-size: 12px; color: var(--muted); text-align: center; }
+.stage-label { font-size: 24px; font-weight: 700; color: var(--accent); margin: 4px 0; }
+.disclaimer {
+  background: #fef3c7; border: 1px solid #fde68a;
+  padding: 10px 14px; border-radius: 6px; font-size: 12px; color: #713f12;
+  margin-top: 16px;
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap" style="padding: 0;">
+    <h1>🧪 Clinical Inference Demo</h1>
+    <p>上传你的合成患者数据 → Agent 立刻基于 wiki KB + 原始证据给出分期 / 风险 / 推荐。
+    支持 <a href="https://jewelina95.github.io/ad-synthetic-generator/method.html" target="_blank">ad-synthetic-generator</a> 输出的 progression / sensor CSV 格式。
+    返回 <a href="index.html">← Dashboard</a></p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section class="card">
+  <h2 style="margin-top: 0;">① 上传患者数据</h2>
+
+  <div id="dropZone" onclick="document.getElementById('fileInput').click()">
+    <div class="icon">📁</div>
+    <div><strong>拖拽 CSV 到这里 / 点击选择</strong></div>
+    <div class="hint">支持 progression.csv 30 天纵向 / 或传感器统计 CSV</div>
+  </div>
+  <input type="file" id="fileInput" accept=".csv" onchange="handleFile(this.files[0])">
+
+  <div id="fileInfo" class="file-info"></div>
+
+  <div class="config-row">
+    <button id="sampleBtn" class="ghost" onclick="loadSample()">载入示例数据 →</button>
+    <span style="flex: 1;"></span>
+    <button id="runBtn" class="primary" disabled onclick="runInference()">▶ 开始评估</button>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ 演示用途。当前为<strong>本地规则引擎</strong>（基于 wiki KB 中的阈值），不是真实临床诊断。任何输出都不能代替医生判断。
+  </div>
+</section>
+
+<section id="resultSection">
+  <h2>② Agent 评估结果</h2>
+  <div id="resultBody"></div>
+</section>
+
+<footer>
+  Demo 引擎: 本地 JS 规则引擎，基于 <a href="https://jewelina95.github.io/ad-wiki-pages/wiki/concepts/ad_staging.md">ad_staging</a> /
+  <a href="https://jewelina95.github.io/ad-wiki-pages/wiki/concepts/bpsd.md">bpsd</a> /
+  <a href="https://jewelina95.github.io/ad-wiki-pages/wiki/concepts/ppg_hrv.md">ppg_hrv</a> 等 wiki 页面的阈值规则。
+  未来切换到 Claude API 真 LLM 推理时无需改 UI。
+</footer>
+
+</div>
+
+<script>
+let parsedData = null;
+let detectedType = null;
+
+const dropZone = document.getElementById('dropZone');
+['dragover', 'dragenter'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('drag'); }));
+['dragleave', 'drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('drag'); }));
+dropZone.addEventListener('drop', ev => { if (ev.dataTransfer.files[0]) handleFile(ev.dataTransfer.files[0]); });
+
+function handleFile(file) {
+  if (!file) return;
+  Papa.parse(file, {
+    header: true, dynamicTyping: true, skipEmptyLines: true,
+    complete: res => acceptData(res.data, file.name)
+  });
+}
+
+function acceptData(rows, name) {
+  if (!rows.length) return showFileError('空文件');
+  parsedData = rows;
+  const cols = Object.keys(rows[0] || {});
+  detectedType = detectFormat(cols);
+
+  let summary = `<strong>已载入</strong> <code>${name}</code> · ${rows.length} 行 · ${cols.length} 列<br>`;
+  summary += `<strong>检测格式:</strong> ${detectedType.label} <span style="color:var(--muted)">(${detectedType.kind})</span><br>`;
+  summary += `<strong>列:</strong> <code>${cols.slice(0, 8).join(', ')}${cols.length > 8 ? '...' : ''}</code>`;
+
+  document.getElementById('fileInfo').innerHTML = summary;
+  document.getElementById('fileInfo').classList.add('show');
+  document.getElementById('runBtn').disabled = false;
+}
+
+function showFileError(msg) {
+  document.getElementById('fileInfo').innerHTML = `<span style="color:var(--red)">⚠ ${msg}</span>`;
+  document.getElementById('fileInfo').classList.add('show');
+  document.getElementById('runBtn').disabled = true;
+}
+
+function detectFormat(cols) {
+  const set = new Set(cols.map(c => c.toLowerCase()));
+  if (set.has('effective_progression') || set.has('raw_progression'))
+    return { kind: 'progression', label: '30 天纵向 progression' };
+  if (set.has('hr_mean') && set.has('gsr_mean'))
+    return { kind: 'sensor_stats', label: '传感器统计聚合' };
+  if ((set.has('hr') || set.has('ppg_ir')) && (set.has('imu_ax') || set.has('gsr')))
+    return { kind: 'raw_sensor', label: '原始传感器时间序列' };
+  if (set.has('event_type') || set.has('bpsd_type'))
+    return { kind: 'bpsd_events', label: 'BPSD 事件记录' };
+  return { kind: 'unknown', label: '未知格式 (将尝试通用解析)' };
+}
+
+// === SAMPLE DATA ===
+function loadSample() {
+  const sample = [];
+  // simulate a 30-day progression for an MCI patient
+  for (let day = 1; day <= 30; day++) {
+    const base = 0.30 + day * 0.005;
+    const noise = (Math.random() - 0.5) * 0.04;
+    sample.push({
+      day: day,
+      raw_progression: +(base + noise).toFixed(3),
+      effective_progression: +(base + noise * 0.6).toFixed(3),
+      reserve_factor: 0.85,
+      hr_mean: +(78 + Math.random() * 4).toFixed(1),
+      hr_std: +(8 - day * 0.05 + Math.random()).toFixed(2),
+      gsr_mean: +(2.1 + base * 0.3).toFixed(2),
+      scr_count: Math.round(8 + base * 12 + Math.random() * 3),
+      svm_std: +(0.85 + base * 0.4 + Math.random() * 0.1).toFixed(2),
+      step_freq: +(1.85 - base * 0.3).toFixed(2),
+      bpsd_events: day % 7 === 0 && base > 0.4 ? 1 : 0
+    });
+  }
+  acceptData(sample, 'sample_P_MCI_30day.csv');
+}
+
+// === INFERENCE ===
+async function runInference() {
+  const result = document.getElementById('resultBody');
+  document.getElementById('resultSection').classList.add('show');
+  result.innerHTML = `<div class="card" style="text-align:center;padding:40px"><span class="spinner"></span> Agent 正在查 wiki KB + 原始证据...</div>`;
+  await new Promise(r => setTimeout(r, 800));
+
+  const features = extractFeatures(parsedData, detectedType);
+  const assessment = ruleEngine(features);
+  result.innerHTML = renderAssessment(features, assessment);
+  result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function extractFeatures(rows, type) {
+  const f = { n_rows: rows.length, type: type.kind, label: type.label };
+  const get = (col) => rows.map(r => Number(r[col])).filter(x => !isNaN(x));
+
+  if (type.kind === 'progression') {
+    const eff = get('effective_progression');
+    const raw = get('raw_progression');
+    const series = eff.length ? eff : raw;
+    if (series.length) {
+      f.progression_final = series[series.length - 1];
+      f.progression_mean = series.reduce((a, b) => a + b, 0) / series.length;
+      f.progression_slope = series.length > 1
+        ? (series[series.length - 1] - series[0]) / (series.length - 1)
+        : 0;
+      f.progression_max = Math.max(...series);
+      f.n_days = series.length;
+    }
+    const hr = get('hr_mean'), hrStd = get('hr_std');
+    if (hr.length) {
+      f.hr_mean = mean(hr);
+      f.hr_std_mean = mean(hrStd);
+      f.hrv_change = hrStd.length > 1 ? (hrStd[hrStd.length - 1] - hrStd[0]) / (hrStd[0] || 1) : 0;
+    }
+    const gsr = get('gsr_mean'), scr = get('scr_count');
+    if (gsr.length) f.gsr_mean = mean(gsr);
+    if (scr.length) f.scr_count_mean = mean(scr);
+    const svm = get('svm_std'), stepF = get('step_freq');
+    if (svm.length) f.svm_std_mean = mean(svm);
+    if (stepF.length) {
+      f.step_freq_mean = mean(stepF);
+      f.step_freq_change = stepF.length > 1 ? (stepF[stepF.length - 1] - stepF[0]) / (stepF[0] || 1) : 0;
+    }
+    const bpsd = get('bpsd_events');
+    if (bpsd.length) f.bpsd_total = bpsd.reduce((a, b) => a + b, 0);
+  } else if (type.kind === 'sensor_stats' || type.kind === 'raw_sensor') {
+    const hr = get('hr_mean').length ? get('hr_mean') : get('hr');
+    const gsr = get('gsr_mean').length ? get('gsr_mean') : get('gsr');
+    if (hr.length) { f.hr_mean = mean(hr); f.hr_std_mean = std(hr); }
+    if (gsr.length) { f.gsr_mean = mean(gsr); }
+  }
+  return f;
+}
+
+function mean(a) { return a.reduce((x, y) => x + y, 0) / a.length; }
+function std(a) {
+  const m = mean(a);
+  return Math.sqrt(a.reduce((s, x) => s + (x - m) ** 2, 0) / a.length);
+}
+
+// Rule engine — encodes wiki KB thresholds
+function ruleEngine(f) {
+  const r = { stage: null, confidence: 0.5, flags: [], evidence: [], recommendations: [] };
+
+  // === Stage from progression ===
+  if (f.progression_final != null) {
+    const p = f.progression_final;
+    if (p < 0.15) { r.stage = 'Normal'; r.stage_idx = 0; }
+    else if (p < 0.30) { r.stage = 'SCD (主观认知下降)'; r.stage_idx = 1; }
+    else if (p < 0.50) { r.stage = 'MCI (轻度认知障碍)'; r.stage_idx = 2; }
+    else if (p < 0.70) { r.stage = 'Mild AD (轻度)'; r.stage_idx = 3; }
+    else if (p < 0.85) { r.stage = 'Moderate AD (中度)'; r.stage_idx = 4; }
+    else { r.stage = 'Severe AD (重度)'; r.stage_idx = 5; }
+    // confidence: lower if value is near boundary
+    const distances = [0.15, 0.30, 0.50, 0.70, 0.85].map(b => Math.abs(p - b));
+    r.confidence = Math.min(0.95, 0.55 + Math.min(...distances) * 2);
+    r.evidence.push({
+      claim: `progression value = ${p.toFixed(3)} → 落在 ${r.stage} 区间`,
+      source: 'wiki/concepts/ad_staging.md',
+      detail: '六阶段映射规则：normal/SCD/MCI/Mild/Moderate/Severe'
+    });
+  }
+
+  // === Trend ===
+  if (f.progression_slope != null) {
+    const slope_per_day = f.progression_slope;
+    const monthly = slope_per_day * 30;
+    if (monthly > 0.05) {
+      r.flags.push({
+        level: 'danger',
+        text: `进展速率快: ${monthly >= 0 ? '+' : ''}${monthly.toFixed(3)}/月`,
+        detail: '高于年化 0.6 风险阈值，建议缩短复诊间隔'
+      });
+    } else if (monthly > 0.02) {
+      r.flags.push({
+        level: 'warn',
+        text: `进展速率中等: ${monthly >= 0 ? '+' : ''}${monthly.toFixed(3)}/月`,
+        detail: '在典型 AD 自然进展范围内'
+      });
+    } else {
+      r.flags.push({
+        level: 'ok',
+        text: `进展稳定: ${monthly >= 0 ? '+' : ''}${monthly.toFixed(3)}/月`,
+        detail: '无显著加速'
+      });
+    }
+  }
+
+  // === HRV decline (PPG) ===
+  if (f.hrv_change != null) {
+    if (f.hrv_change < -0.20) {
+      r.flags.push({
+        level: 'danger',
+        text: `HRV (hr_std) 持续下降 ${(f.hrv_change * 100).toFixed(0)}%`,
+        detail: '提示自主神经退化（迷走神经通路 / 胆碱能系统外周表现）'
+      });
+      r.evidence.push({
+        claim: 'SDNN/RMSSD 相对基线下降 >20% 是临界值',
+        source: 'wiki/concepts/ppg_hrv.md',
+        detail: 'Collins 2012：HRV 降低与 AD 风险独立相关'
+      });
+    } else if (f.hrv_change < -0.10) {
+      r.flags.push({
+        level: 'warn',
+        text: `HRV 轻度下降 ${(f.hrv_change * 100).toFixed(0)}%`,
+        detail: '需观察是否持续'
+      });
+    }
+  }
+
+  // === Gait change (IMU) ===
+  if (f.step_freq_change != null && f.step_freq_change < -0.15) {
+    r.flags.push({
+      level: 'warn',
+      text: `步频下降 ${(f.step_freq_change * 100).toFixed(0)}%`,
+      detail: '运动认知关联：前额叶-海马回路损伤的早期信号'
+    });
+    r.evidence.push({
+      claim: '步速拐点在 MCI 诊断前 12.1 年出现',
+      source: 'wiki/concepts/imu_gait.md',
+      detail: 'Buracchio 2010 (n=204, cohort study)'
+    });
+  }
+
+  // === BPSD ===
+  if (f.bpsd_total != null && f.bpsd_total >= 3) {
+    r.flags.push({
+      level: 'danger',
+      text: `BPSD 事件 ${f.bpsd_total} 次 / ${f.n_days || 30} 天`,
+      detail: '激越/游走/睡眠紊乱等症状频发，建议非药物干预介入'
+    });
+    r.evidence.push({
+      claim: 'BPSD 多模态信号 AUC 0.87',
+      source: 'wiki/concepts/bpsd.md',
+      detail: 'Iaboni 2022 (n=48 nursing home)，个性化模型 AUC 0.80–0.95'
+    });
+    r.recommendations.push({
+      title: '非药物干预（一线）',
+      detail: '音乐治疗 · 感官降刺激 · 环境结构化',
+      cite: 'wiki/concepts/bpsd_agitation.md'
+    });
+  } else if (f.bpsd_total != null && f.bpsd_total >= 1) {
+    r.flags.push({
+      level: 'warn',
+      text: `BPSD 事件 ${f.bpsd_total} 次 / ${f.n_days || 30} 天`,
+      detail: '低频 BPSD，记录触发情境'
+    });
+  } else {
+    r.flags.push({ level: 'ok', text: 'BPSD 0 次 / 30 天', detail: '当前周期无 BPSD 发作' });
+  }
+
+  // === Stage-based recommendations ===
+  if (r.stage_idx === 2) {
+    // MCI — 关键阶段
+    r.recommendations.push({
+      title: '建议金标准检测',
+      detail: 'Plasma p-tau217 / 必要时 Amyloid PET — MCI 阶段是 Lecanemab/Donanemab 最佳治疗窗',
+      cite: 'wiki/concepts/atn_framework.md'
+    });
+    r.recommendations.push({
+      title: '认知储备 + 监测',
+      detail: '认知训练 · 双任务步态测试 · 缩短随访至每 3 个月',
+      cite: 'wiki/concepts/mcr_criteria.md'
+    });
+  } else if (r.stage_idx === 3 || r.stage_idx === 4) {
+    r.recommendations.push({
+      title: '药物 + 多模态干预',
+      detail: '胆碱酯酶抑制剂（监测心率） · 必要时 memantine · 强化非药物方案',
+      cite: 'wiki/concepts/medications_ad.md'
+    });
+  } else if (r.stage_idx === 1) {
+    r.recommendations.push({
+      title: '建立个性化基线',
+      detail: '前 2-4 周连续监测建立个体基线 · 季度复评 · 关注双任务代价',
+      cite: 'wiki/concepts/mcr_criteria.md'
+    });
+  }
+
+  return r;
+}
+
+// === RENDER ===
+function renderAssessment(f, r) {
+  const stages = ['Normal', 'SCD', 'MCI', 'Mild AD', 'Moderate AD', 'Severe AD'];
+  const stageColors = ['#16a34a', '#65a30d', '#ca8a04', '#ea580c', '#dc2626', '#7f1d1d'];
+
+  let html = '';
+
+  // === Block 1: stage ===
+  html += `<div class="result-block">
+    <h3 style="margin:0 0 4px;font-size:14px;color:var(--muted);font-weight:500">分期判断</h3>
+    <div class="stage-label">${r.stage || '未知'}</div>
+    <div style="font-size:13px;color:var(--muted)">置信度</div>
+    <div class="confidence-bar"><div style="width:${(r.confidence * 100).toFixed(0)}%"></div></div>
+    <div style="font-size:13px">${(r.confidence * 100).toFixed(0)}% · 基于 progression value 距阶段边界</div>
+
+    <div class="stage-bar">
+      ${stages.map((s, i) => `<div class="stage-cell ${i === r.stage_idx ? 'active' : ''}" style="background:${stageColors[i]}">${s}</div>`).join('')}
+    </div>
+  </div>`;
+
+  // === Block 2: metrics ===
+  html += `<div class="result-block">
+    <h3 style="margin:0 0 8px;font-size:14px;color:var(--muted);font-weight:500">关键指标</h3>
+    <div class="metric-grid">`;
+  if (f.progression_final != null) html += metricCell('progression', f.progression_final.toFixed(3), `slope ${(f.progression_slope * 30).toFixed(3)}/月`);
+  if (f.hr_mean != null) html += metricCell('HR mean (bpm)', f.hr_mean.toFixed(1), '');
+  if (f.hr_std_mean != null) html += metricCell('HRV (hr_std)', f.hr_std_mean.toFixed(2), f.hrv_change != null ? `Δ ${(f.hrv_change * 100).toFixed(0)}%` : '');
+  if (f.gsr_mean != null) html += metricCell('GSR mean', f.gsr_mean.toFixed(2), '');
+  if (f.scr_count_mean != null) html += metricCell('SCR/小时', f.scr_count_mean.toFixed(1), '');
+  if (f.step_freq_mean != null) html += metricCell('Step freq (Hz)', f.step_freq_mean.toFixed(2), f.step_freq_change != null ? `Δ ${(f.step_freq_change * 100).toFixed(0)}%` : '');
+  if (f.bpsd_total != null) html += metricCell('BPSD 事件', f.bpsd_total, '/ 30 天');
+  html += `</div></div>`;
+
+  // === Block 3: flags ===
+  html += `<div class="result-block">
+    <h3 style="margin:0 0 8px;font-size:14px;color:var(--muted);font-weight:500">风险标记</h3>`;
+  for (const flag of r.flags) {
+    const icon = flag.level === 'danger' ? '🔴' : flag.level === 'warn' ? '⚠️' : '✓';
+    html += `<div class="flag ${flag.level}">
+      <span class="flag-icon">${icon}</span>
+      <div><strong>${flag.text}</strong><br><span style="font-size:12px;opacity:0.85">${flag.detail}</span></div>
+    </div>`;
+  }
+  html += `</div>`;
+
+  // === Block 4: evidence ===
+  if (r.evidence.length) {
+    html += `<div class="result-block">
+      <h3 style="margin:0 0 8px;font-size:14px;color:var(--muted);font-weight:500">推理依据 (wiki + 原始论文)</h3>`;
+    for (const e of r.evidence) {
+      html += `<div class="evidence">
+        <strong>${e.claim}</strong><br>
+        <span style="color:var(--muted)">${e.detail}</span><br>
+        来源: <a href="https://jewelina95.github.io/ad-wiki-pages/${e.source}" target="_blank">${e.source}</a>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // === Block 5: recommendations ===
+  if (r.recommendations.length) {
+    html += `<div class="result-block">
+      <h3 style="margin:0 0 8px;font-size:14px;color:var(--muted);font-weight:500">推荐操作</h3>`;
+    for (const rec of r.recommendations) {
+      html += `<div class="evidence" style="border-left-color:#8b5cf6;background:#faf5ff;color:#4c1d95">
+        <strong>${rec.title}</strong><br>
+        ${rec.detail}<br>
+        参考: <a href="https://jewelina95.github.io/ad-wiki-pages/${rec.cite}" target="_blank">${rec.cite}</a>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  return html;
+}
+
+function metricCell(label, value, delta) {
+  const up = String(delta).startsWith('Δ +') || String(delta).startsWith('+');
+  return `<div class="metric-cell">
+    <div class="label">${label}</div>
+    <div class="value">${value}</div>
+    ${delta ? `<div class="delta ${up ? 'up' : 'down'}">${delta}</div>` : ''}
+  </div>`;
+}
+</script>
+</body>
+</html>
