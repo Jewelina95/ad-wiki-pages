@@ -331,6 +331,34 @@ footer {
   background: #fef3c7; border: 1px solid #fde68a; color: #92400e;
   padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 16px;
 }
+.recent-changes {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden;
+}
+.commit-row {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 10px 16px; border-top: 1px solid #f5f5f4;
+  font-size: 13px;
+}
+.commit-row:first-child { border-top: 0; }
+.commit-row .commit-date {
+  color: var(--muted); font-size: 11px; min-width: 80px;
+  font-family: ui-monospace, monospace;
+}
+.commit-row .commit-msg { flex: 1; color: var(--text); }
+.commit-row .commit-msg a { color: var(--accent); text-decoration: none; }
+.commit-row .commit-msg a:hover { text-decoration: underline; }
+.commit-row .commit-author { color: var(--muted); font-size: 11px; }
+.commit-row .commit-bot {
+  background: #fef3c7; color: #92400e; padding: 1px 6px;
+  border-radius: 3px; font-size: 10px; font-weight: 600; margin-left: 6px;
+}
+.refresh-btn {
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 4px; padding: 4px 10px; cursor: pointer;
+  font-size: 12px; color: var(--muted); margin-left: 8px;
+}
+.refresh-btn:hover { background: var(--bg); color: var(--text); }
 .arch {
   background: var(--card); border: 1px solid var(--border); border-radius: 8px;
   padding: 20px; overflow-x: auto;
@@ -497,6 +525,15 @@ def main():
 </section>
 
 <section>
+  <h2>最近修改 <span class="muted">从 GitHub 实时拉取（最新 10 条）</span>
+    <button class="refresh-btn" onclick="loadRecentChanges()">刷新 ↻</button>
+  </h2>
+  <div id="recentChanges" class="recent-changes">
+    <div style="padding:14px;color:var(--muted);font-size:13px">载入中…</div>
+  </div>
+</section>
+
+<section>
   <h2>开放问题 <span class="muted">必须看见的不确定性</span></h2>
   {render_oqs()}
 </section>
@@ -595,6 +632,50 @@ document.querySelectorAll('a[href$=".md"]').forEach(a => {{
     loadMarkdown(a.getAttribute('href'));
   }});
 }});
+
+// === Recent changes (GitHub commits API) ===
+async function loadRecentChanges() {{
+  const container = document.getElementById('recentChanges');
+  if (!container) return;
+  container.innerHTML = '<div style="padding:14px;color:var(--muted);font-size:13px">载入中…</div>';
+  try {{
+    const r = await fetch('https://api.github.com/repos/Jewelina95/ad-wiki-pages/commits?per_page=10');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const commits = await r.json();
+    if (!commits.length) {{
+      container.innerHTML = '<div style="padding:14px;color:var(--muted);font-size:13px">暂无 commit</div>';
+      return;
+    }}
+    const fmtDate = iso => {{
+      const d = new Date(iso);
+      const now = new Date();
+      const diffH = (now - d) / 36e5;
+      if (diffH < 1) return Math.max(1, Math.round(diffH * 60)) + ' 分钟前';
+      if (diffH < 24) return Math.round(diffH) + ' 小时前';
+      if (diffH < 24 * 7) return Math.round(diffH / 24) + ' 天前';
+      return d.toISOString().slice(0, 10);
+    }};
+    container.innerHTML = commits.map(c => {{
+      const msg = (c.commit.message || '').split('\\n')[0];
+      const author = c.commit.author.name || '';
+      const isBot = author.includes('github-actions') || author.includes('[bot]');
+      const safeMsg = msg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return `
+        <div class="commit-row">
+          <span class="commit-date">${{fmtDate(c.commit.author.date)}}</span>
+          <span class="commit-msg">
+            <a href="${{c.html_url}}" target="_blank" rel="noopener">${{safeMsg}}</a>
+            ${{isBot ? '<span class="commit-bot">auto</span>' : ''}}
+          </span>
+          <span class="commit-author">${{author.replace('[bot]','')}}</span>
+        </div>`;
+    }}).join('');
+  }} catch (err) {{
+    container.innerHTML = '<div style="padding:14px;color:var(--muted);font-size:13px">' +
+      '无法载入 GitHub commits: ' + err.message + '（可能 API 限流，每小时 60 次）</div>';
+  }}
+}}
+loadRecentChanges();
 </script>
 
 </body>
