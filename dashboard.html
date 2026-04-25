@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AD WIKI · Dashboard</title>
+<style>
+:root {
+  --bg: #fafaf9;
+  --card: #ffffff;
+  --text: #1c1917;
+  --muted: #57534e;
+  --accent: #0f766e;
+  --border: #e7e5e4;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+}
+.wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+header.hero {
+  background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+  color: #f0fdfa;
+  padding: 48px 24px;
+  margin-bottom: 32px;
+}
+header.hero h1 { margin: 0 0 8px; font-size: 32px; letter-spacing: -0.02em; }
+header.hero p { margin: 0; max-width: 800px; font-size: 16px; opacity: 0.9; }
+header.hero .meta { font-size: 13px; opacity: 0.7; margin-top: 12px; }
+h2 { font-size: 20px; margin: 40px 0 16px; letter-spacing: -0.01em; }
+h2 .muted { color: var(--muted); font-weight: 400; font-size: 14px; margin-left: 8px; }
+section { margin-bottom: 8px; }
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+.card h3 { margin: 0 0 6px; font-size: 15px; }
+.card p { margin: 0 0 12px; font-size: 13px; color: var(--muted); }
+.card .tag {
+  display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px;
+  background: #f0fdfa; color: var(--accent); border: 1px solid #99f6e4;
+}
+.card a { color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 500; }
+.card a:hover { text-decoration: underline; }
+.oq-list { list-style: none; padding: 0; margin: 0; }
+.oq-list li {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid #dc2626;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.oq-list .oq-id { font-weight: 600; color: #dc2626; font-size: 13px; min-width: 28px; }
+.oq-list a { color: var(--text); text-decoration: none; flex: 1; font-size: 14px; }
+.oq-list a:hover { color: var(--accent); }
+.section-block {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.section-block summary {
+  padding: 12px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-block summary::-webkit-details-marker { display: none; }
+.section-block summary::before {
+  content: "▸";
+  display: inline-block;
+  transition: transform 0.15s;
+  color: var(--muted);
+}
+.section-block[open] summary::before { transform: rotate(90deg); }
+.section-block summary .desc {
+  font-weight: 400; color: var(--muted); font-size: 12px; margin-left: auto;
+}
+.section-block .body { padding: 0 16px 12px; }
+.page-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 0;
+  border-top: 1px solid #f5f5f4;
+  font-size: 13px;
+}
+.page-row a { color: var(--text); text-decoration: none; flex: 1; }
+.page-row a:hover { color: var(--accent); }
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.raw-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+.raw-cell {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+.raw-cell .name { font-weight: 600; font-size: 13px; }
+.raw-cell .stat { color: var(--muted); font-size: 12px; margin-top: 2px; }
+footer {
+  margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border);
+  font-size: 12px; color: var(--muted); text-align: center;
+}
+
+/* === Modal / inline markdown viewer === */
+#mdModal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: none; align-items: stretch; justify-content: center;
+  z-index: 1000; padding: 20px;
+}
+#mdModal.open { display: flex; }
+#mdModal .panel {
+  background: white; border-radius: 8px; width: min(900px, 100%);
+  max-height: 100%; display: flex; flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+#mdModal header.bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 18px; border-bottom: 1px solid var(--border);
+  background: #fafaf9; border-radius: 8px 8px 0 0; margin: 0;
+}
+#mdModal header.bar .path { color: var(--muted); font-size: 12px; flex: 1; font-family: ui-monospace, monospace; }
+#mdModal header.bar button {
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 13px;
+}
+#mdModal header.bar button:hover { background: var(--bg); }
+#mdContent {
+  padding: 24px 32px; overflow-y: auto; flex: 1;
+  font-size: 14px; line-height: 1.7;
+}
+#mdContent h1, #mdContent h2, #mdContent h3 { margin-top: 24px; }
+#mdContent h1 { font-size: 22px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+#mdContent h2 { font-size: 18px; }
+#mdContent h3 { font-size: 15px; }
+#mdContent code { background: #f5f5f4; padding: 1px 6px; border-radius: 3px; font-size: 0.9em; }
+#mdContent pre { background: #f5f5f4; padding: 12px; border-radius: 6px; overflow-x: auto; }
+#mdContent pre code { background: transparent; padding: 0; }
+#mdContent table { border-collapse: collapse; margin: 12px 0; }
+#mdContent th, #mdContent td { border: 1px solid var(--border); padding: 6px 12px; text-align: left; }
+#mdContent th { background: #fafaf9; }
+#mdContent blockquote { border-left: 3px solid var(--accent); padding-left: 16px; color: var(--muted); margin: 16px 0; }
+#mdContent a { color: var(--accent); }
+#mdFront {
+  background: #f0fdfa; border: 1px solid #99f6e4;
+  border-radius: 6px; padding: 10px 14px; margin-bottom: 16px;
+  font-size: 12px; color: #0f766e; font-family: ui-monospace, monospace;
+  white-space: pre-wrap;
+}
+.notice {
+  background: #fef3c7; border: 1px solid #fde68a; color: #92400e;
+  padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 16px;
+}
+.arch {
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 20px; overflow-x: auto;
+}
+.arch svg { display: block; margin: 0 auto; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); margin-top: 8px; }
+.legend span.swatch {
+  display: inline-block; width: 12px; height: 12px; border-radius: 3px;
+  margin-right: 6px; vertical-align: -2px;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+<!-- Markdown modal -->
+<div id="mdModal" onclick="if(event.target===this) closeModal()">
+  <div class="panel">
+    <header class="bar">
+      <span class="path" id="mdPath"></span>
+      <button onclick="window.open(document.getElementById('mdPath').textContent, '_blank')">在新标签打开 ↗</button>
+      <button onclick="closeModal()">关闭 ✕</button>
+    </header>
+    <div id="mdContent"></div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap" style="padding: 0;">
+    <h1>AD WIKI</h1>
+    <p>智能手套（EDA + PPG + IMU + 麦克风）+ 多智能体系统，实时监测 AD 患者状态、判断疾病阶段（SCD→MCI→轻度→中度→重度），并配合非药物干预。</p>
+    <div class="meta">54 个 wiki 页 · 0 个 raw 类别 · 构建于 2026-04-25</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <h2>核心资产 <span class="muted">你现在手上有的 4 样东西</span></h2>
+  <div class="cards">
+
+<div class="card">
+  <h3>专家知识库设计</h3>
+  <p>5 目录 / 7 段格式 / 医生可编辑的临床手册式 KB，已和临床团队对齐</p>
+  <span class="tag">已就绪</span>
+  <div style="margin-top:10px"><a href="wiki/synthesis/expert_kb_report.md">查看 →</a></div>
+</div>
+
+<div class="card">
+  <h3>OpenNeuro 合成数据源</h3>
+  <p>用于 v1 合成数据校准（IMU 退化幅度、量表分布、SCD 早期建模等）</p>
+  <span class="tag">待登记数据集 ID</span>
+  <div style="margin-top:10px"><a href="wiki/methods/synthetic_data_review.md">查看 →</a></div>
+</div>
+
+<div class="card">
+  <h3>Clinical advisor consultation</h3>
+  <p>26-question structured interview with senior clinician (private — see internal repo)</p>
+  <span class="tag">私有</span>
+  <div style="margin-top:10px"><a href="#">查看 →</a></div>
+</div>
+
+<div class="card">
+  <h3>S01–S04 baseline</h3>
+  <p>4 健康受试者 × 12 任务，30 min 协议；S03/S04 完整，S02 部分 HR 异常</p>
+  <span class="tag">已就绪</span>
+  <div style="margin-top:10px"><a href="wiki/datasets/baseline_4.8.md">查看 →</a></div>
+</div>
+</div>
+</section>
+
+<section>
+  <h2>开放问题 <span class="muted">必须看见的不确定性</span></h2>
+  <ul class="oq-list">
+<li><span class="oq-id">#1</span><a href="wiki/methods/synthetic_data_review.md">合成数据 v0 是否合理</a><span class="badge" style="background:#dc2626">open question</span></li>
+<li><span class="oq-id">#2</span><a href="wiki/synthesis/what_we_dont_know.md">中文社区 BPSD 流行率与信号</a><span class="badge" style="background:#dc2626">open question</span></li>
+<li><span class="oq-id">#3</span><a href="wiki/agents/_architecture.md">Agent 桩→实现的差距 (8/9 stub)</a><span class="badge" style="background:#dc2626">open question</span></li>
+<li><span class="oq-id">#4</span><a href="wiki/synthesis/what_we_dont_know.md">可穿戴 × 临床数据未交叉</a><span class="badge" style="background:#dc2626">open question</span></li>
+<li><span class="oq-id">#5</span><a href="wiki/synthesis/what_we_dont_know.md">硬件还没造出来</a><span class="badge" style="background:#dc2626">open question</span></li>
+</ul>
+</section>
+
+<section>
+  <h2>架构 <span class="muted">三层 + Agent 拓扑</span></h2>
+  <div class="arch">
+    
+<svg viewBox="0 0 800 360" width="100%" style="max-width: 800px;">
+  <!-- Layer boxes -->
+  <rect x="40" y="40" width="220" height="280" rx="8" fill="#fff7ed" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="150" y="62" font-size="13" font-weight="600" text-anchor="middle" fill="#9a3412">raw/ — 不可变素材</text>
+  <text x="150" y="92" font-size="11" text-anchor="middle" fill="#7c2d12">papers (10)</text>
+  <text x="150" y="110" font-size="11" text-anchor="middle" fill="#7c2d12">interviews (1)</text>
+  <text x="150" y="128" font-size="11" text-anchor="middle" fill="#7c2d12">presentations (2)</text>
+  <text x="150" y="146" font-size="11" text-anchor="middle" fill="#7c2d12">clinical_data (10)</text>
+  <text x="150" y="164" font-size="11" text-anchor="middle" fill="#7c2d12">sensor_data (~100)</text>
+  <text x="150" y="182" font-size="11" text-anchor="middle" fill="#7c2d12">templates / archives</text>
+
+  <rect x="290" y="40" width="220" height="280" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="400" y="62" font-size="13" font-weight="600" text-anchor="middle" fill="#065f46">wiki/ — 策展知识</text>
+  <text x="400" y="92" font-size="11" text-anchor="middle" fill="#064e3b">entities (6)</text>
+  <text x="400" y="110" font-size="11" text-anchor="middle" fill="#064e3b">concepts (22)</text>
+  <text x="400" y="128" font-size="11" text-anchor="middle" fill="#064e3b">methods (8)</text>
+  <text x="400" y="146" font-size="11" text-anchor="middle" fill="#064e3b">agents (9)</text>
+  <text x="400" y="164" font-size="11" text-anchor="middle" fill="#064e3b">synthesis (8)</text>
+  <text x="400" y="182" font-size="11" text-anchor="middle" fill="#064e3b">datasets (7)</text>
+  <text x="400" y="200" font-size="11" text-anchor="middle" fill="#064e3b">meetings (3)</text>
+  <text x="400" y="218" font-size="11" text-anchor="middle" fill="#064e3b">deliverables (15)</text>
+
+  <rect x="540" y="40" width="220" height="280" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="650" y="62" font-size="13" font-weight="600" text-anchor="middle" fill="#1e3a8a">code/ — 实现</text>
+  <text x="650" y="92" font-size="11" text-anchor="middle" fill="#1e40af">src/agents/ (8 stub + base)</text>
+  <text x="650" y="110" font-size="11" text-anchor="middle" fill="#1e40af">src/sensors/ (实现)</text>
+  <text x="650" y="128" font-size="11" text-anchor="middle" fill="#1e40af">src/skills/ad_staging</text>
+  <text x="650" y="146" font-size="11" text-anchor="middle" fill="#1e40af">scripts/ + legacy/</text>
+  <text x="650" y="164" font-size="11" text-anchor="middle" fill="#1e40af">kb_loader/ + JSON KB</text>
+
+  <!-- Arrows -->
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#525252"/>
+    </marker>
+  </defs>
+  <line x1="262" y1="180" x2="288" y2="180" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="512" y1="180" x2="538" y2="180" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="275" y="172" font-size="10" text-anchor="middle" fill="#525252">cite</text>
+  <text x="525" y="172" font-size="10" text-anchor="middle" fill="#525252">cite</text>
+</svg>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:#fb923c"></span>raw 不可变</span>
+      <span><span class="swatch" style="background:#10b981"></span>wiki 策展</span>
+      <span><span class="swatch" style="background:#3b82f6"></span>code 实现</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Wiki 页面 <span class="muted">54 页 · 点击展开各类</span></h2>
+  <details class="section-block" >
+<summary>概念 Concepts <span class="desc">领域知识：分期 / BPSD / 传感器原理 · 22 页</span></summary>
+<div class="body">
+<div class="page-row">
+<a href="wiki/concepts/_source_ad_staging_seed.md">source ad staging seed</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/_source_sensor_design_proposal.md">source sensor design proposal</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/_source_sensor_signal_principles.md">source sensor signal principles</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/ad_staging.md">AD staging — SCD / MCI / mild / moderate / severe</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/amyloid_hypothesis.md">Amyloid hypothesis</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/atn_framework.md">AT(N) biomarker framework (Jack 2024 revised)</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/bpsd.md">BPSD — Behavioural and Psychological Symptoms of Dementia</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/bpsd_agitation.md">BPSD — Agitation / Aggression</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/bpsd_anxiety.md">BPSD — Anxiety</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/bpsd_apathy.md">BPSD — Apathy</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/bpsd_depression.md">BPSD — Depression</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/bpsd_sleep_disorder.md">BPSD — Sleep disorder</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/bpsd_sundowning.md">BPSD — Sundowning</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/bpsd_wandering.md">BPSD — Wandering</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/eda_signal.md">EDA — electrodermal activity</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/gait_norms.md">Gait speed norms (older adults)</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/glove_form_factor.md">glove form factor</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/imu_gait.md">IMU — gait, dual-task cost, hand tremor</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/mcr_criteria.md">MCR — Motoric Cognitive Risk syndrome</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/medications_ad.md">AD medications and their sensor footprints</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/ppg_hrv.md">PPG, HR, and HRV</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/concepts/voice_acoustic_linguistic.md">Voice — acoustic and linguistic features</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+</div></details>
+<details class="section-block" >
+<summary>方法 Methods <span class="desc">数据管道 / 预处理 / 合成数据 / 推理模式 · 8 页</span></summary>
+<div class="body">
+<div class="page-row">
+<a href="wiki/methods/_data_interface_storage_v1.md">data interface storage v1</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/methods/agent_data_loader_interface.md">Agent data loader interface</a>
+<span class="badge" style="background:#ca8a04">draft</span>
+</div>
+<div class="page-row">
+<a href="wiki/methods/claude_cli_inference_pattern.md">claude cli inference pattern</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/methods/data_pipeline.md">data pipeline</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/methods/preprocessing_per_modality.md">preprocessing per modality</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/methods/synthetic_data_methods_landscape.md">synthetic data methods landscape</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/methods/synthetic_data_review.md">Synthetic data — review and open questions</a>
+<span class="badge" style="background:#dc2626">open question</span>
+</div>
+<div class="page-row">
+<a href="wiki/methods/synthetic_data_v0_rules.md">AD-SensorDataFactory 合成数据生成器设计方案 (v0)</a>
+<span class="badge" style="background:#ea580c">working hypothesis</span>
+</div>
+</div></details>
+<details class="section-block" open>
+<summary>智能体 Agents <span class="desc">7 专科 + 1 协调 · 9 页</span></summary>
+<div class="body">
+<div class="page-row">
+<a href="wiki/agents/_architecture.md">Multi-agent architecture overview</a>
+<span class="badge" style="background:#ca8a04">draft</span>
+</div>
+<div class="page-row">
+<a href="wiki/agents/autonomic_agent.md">Autonomic agent</a>
+<span class="badge" style="background:#ca8a04">draft</span>
+</div>
+<div class="page-row">
+<a href="wiki/agents/care_management_agent.md">Care management agent</a>
+<span class="badge" style="background:#ca8a04">draft</span>
+</div>
+<div class="page-row">
+<a href="wiki/agents/clinical_diagnosis_agent.md">Clinical diagnosis agent</a>
+<span class="badge" style="background:#ca8a04">draft</span>
+</div>
+<div class="page-row">
+<a href="wiki/agents/emotion_behavior_agent.md">Emotion-behavior agent</a>
+<span class="badge" style="background:#ca8a04">draft</span>
+</div>
+<div class="page-row">
+<a href="wiki/agents/intervention_agent.md">Intervention agent</a>
+<span class="badge" style="background:#ca8a04">draft</span>
+</div>
+<div class="page-row">
+<a href="wiki/agents/language_cognitive_agent.md">Language-cognitive agent</a>
+<span class="badge" style="background:#ca8a04">draft</span>
+</div>
+<div class="page-row">
+<a href="wiki/agents/master_coordinator.md">Master Coordinator</a>
+<span class="badge" style="background:#ca8a04">draft</span>
+</div>
+<div class="page-row">
+<a href="wiki/agents/motor_cognitive_agent.md">Motor-cognitive agent</a>
+<span class="badge" style="background:#ca8a04">draft</span>
+</div>
+</div></details>
+<details class="section-block" open>
+<summary>综合 Synthesis <span class="desc">横切论述与开放问题 · 8 页</span></summary>
+<div class="body">
+<div class="page-row">
+<a href="wiki/synthesis/clinical_to_sensor_mapping.md">Clinical-to-sensor mapping (stage transitions)</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/synthesis/expert_kb_report.md">expert kb report</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/synthesis/innovation_thesis.md">innovation thesis</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/synthesis/kb_optimization_report.md">kb optimization report</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/synthesis/project_overview.md">project overview</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/synthesis/related_work_positioning.md">related work positioning</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/synthesis/what_we_dont_know.md">What we don&#x27;t know — open questions ledger</a>
+<span class="badge" style="background:#dc2626">open question</span>
+</div>
+<div class="page-row">
+<a href="wiki/synthesis/why_glove.md">Why a glove form factor</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+</div></details>
+<details class="section-block" >
+<summary>数据集 Datasets <span class="desc">raw 数据的说明页 · 7 页</span></summary>
+<div class="body">
+<div class="page-row">
+<a href="wiki/datasets/_pilot_3.30_30min_protocol.md">pilot 3.30 30min protocol</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/datasets/_pilot_3.30_full_protocol.md">pilot 3.30 full protocol</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/datasets/baseline_4.8.md">baseline 4.8</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/datasets/clinical_xlsx_2026-04-18.md">Clinical xlsx 2026-04-18 — longitudinal cohort (脱敏)</a>
+<span class="badge" style="background:#ca8a04">draft</span>
+</div>
+<div class="page-row">
+<a href="wiki/datasets/pilot_3.20.md">Pilot 3.20 — early collection</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/datasets/pilot_3.30.md">Pilot 3.30 — protocol design + 2-subject collection</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/datasets/synthetic_84.md">Synthetic 4.8 — 81 stage-overlay CSVs</a>
+<span class="badge" style="background:#ea580c">working hypothesis</span>
+</div>
+</div></details>
+</section>
+
+<section>
+  <h2>raw/ 清单 <span class="muted">不可变素材</span></h2>
+  <div class="raw-grid">
+</div>
+</section>
+
+<section>
+  <h2>治理文件 <span class="muted">顶层四个</span></h2>
+  <div class="cards">
+    <div class="card"><h3>README.md</h3><p>项目入口</p><a href="README.md">打开 →</a></div>
+    <div class="card"><h3>index.md</h3><p>所有页面目录</p><a href="index.md">打开 →</a></div>
+    <div class="card"><h3>log.md</h3><p>时间线日志</p><a href="log.md">打开 →</a></div>
+    <div class="card"><h3>schema.md</h3><p>操作手册</p><a href="schema.md">打开 →</a></div>
+  </div>
+</section>
+
+<footer>
+  生成自 <code>code/scripts/build_dashboard.py</code> · 2026-04-25<br>
+  重新生成: <code>python3 code/scripts/build_dashboard.py</code><br>
+  启动浏览: <code>./view.sh</code>（自动开服务器 + 浏览器）
+</footer>
+
+</div>
+
+<script>
+const modal = document.getElementById('mdModal');
+const mdPath = document.getElementById('mdPath');
+const mdContent = document.getElementById('mdContent');
+
+function closeModal() { modal.classList.remove('open'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function parseFrontMatter(text) {
+  const m = text.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
+  if (!m) return { fm: '', body: text };
+  return { fm: m[1], body: text.slice(m[0].length) };
+}
+
+async function loadMarkdown(path) {
+  modal.classList.add('open');
+  mdPath.textContent = path;
+  mdContent.innerHTML = '<p style="color:#999">载入中…</p>';
+  try {
+    const r = await fetch(path);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const text = await r.text();
+    const {fm, body} = parseFrontMatter(text);
+    let html = '';
+    if (fm) html += '<div id="mdFront">' + fm + '</div>';
+    if (location.protocol === 'file:') {
+      html += '<div class="notice">⚠️ 用 file:// 协议打开，部分链接 + 图片可能 404。建议用 <code>./view.sh</code> 起本地服务。</div>';
+    }
+    html += marked.parse(body);
+    mdContent.innerHTML = html;
+    mdContent.scrollTop = 0;
+    // intercept internal .md links inside the modal
+    mdContent.querySelectorAll('a[href$=".md"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const href = a.getAttribute('href');
+        const base = path.split('/').slice(0, -1).join('/');
+        const resolved = new URL(href, location.origin + '/' + (base ? base + '/' : '')).pathname.replace(/^\//, '');
+        loadMarkdown(resolved);
+      });
+    });
+  } catch (err) {
+    mdContent.innerHTML = '<div class="notice">无法载入 <code>' + path + '</code>: ' + err.message +
+      '。如果你直接双击打开了本文件（file://），请改用 <code>./view.sh</code>。</div>';
+  }
+}
+
+// hook all .md links on the dashboard
+document.querySelectorAll('a[href$=".md"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    loadMarkdown(a.getAttribute('href'));
+  });
+});
+</script>
+
+</body>
+</html>
