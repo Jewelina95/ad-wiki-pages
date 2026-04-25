@@ -437,6 +437,254 @@ footer {
 </section>
 
 <section>
+  <h2>实时动态监测 <span class="muted">同一个 Agent · 5 种 cadence 同时跑</span></h2>
+  <div class="arch">
+    
+<svg viewBox="0 0 920 520" width="100%" style="max-width: 920px;">
+  <defs>
+    <marker id="arrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#525252"/>
+    </marker>
+    <marker id="arrRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+    </marker>
+  </defs>
+
+  <text x="460" y="24" font-size="14" font-weight="700" text-anchor="middle" fill="#1c1917">实时动态判断：同一个 Agent，5 种 cadence 同时跑</text>
+
+  <!-- 左：传感器流（永远在跑）-->
+  <rect x="30" y="50" width="180" height="420" rx="10" fill="#fff7ed" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="120" y="74" font-size="13" font-weight="600" text-anchor="middle" fill="#9a3412">传感器流（24/7）</text>
+  <text x="120" y="92" font-size="10" text-anchor="middle" fill="#7c2d12">EDA · PPG · IMU · Mic</text>
+
+  <!-- 流式波形示意 -->
+  <path d="M 50 130 Q 70 120 90 130 T 130 130 T 170 130 T 200 130" stroke="#fb923c" stroke-width="1.5" fill="none"/>
+  <path d="M 50 160 Q 70 145 90 160 T 130 160 T 170 160 T 200 160" stroke="#fb923c" stroke-width="1.5" fill="none"/>
+  <path d="M 50 190 Q 70 175 90 190 T 130 190 T 170 190 T 200 190" stroke="#fb923c" stroke-width="1.5" fill="none"/>
+
+  <text x="120" y="235" font-size="10" text-anchor="middle" fill="#9a3412">→ 时间窗 buffer</text>
+  <text x="120" y="252" font-size="10" text-anchor="middle" fill="#9a3412">滚动维护</text>
+
+  <!-- 个性化基线 -->
+  <rect x="50" y="290" width="140" height="80" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
+  <text x="120" y="312" font-size="11" font-weight="600" text-anchor="middle" fill="#065f46">个性化基线</text>
+  <text x="120" y="328" font-size="9" text-anchor="middle" fill="#047857">前 2–4 周自动建立</text>
+  <text x="120" y="342" font-size="9" text-anchor="middle" fill="#047857">每天滑窗更新</text>
+  <text x="120" y="358" font-size="9" text-anchor="middle" fill="#047857">检测漂移 vs 自身</text>
+
+  <!-- 历史评估 -->
+  <rect x="50" y="385" width="140" height="70" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1"/>
+  <text x="120" y="408" font-size="11" font-weight="600" text-anchor="middle" fill="#1e3a8a">历史评估记录</text>
+  <text x="120" y="424" font-size="9" text-anchor="middle" fill="#1e40af">最近 N 次结果</text>
+  <text x="120" y="440" font-size="9" text-anchor="middle" fill="#1e40af">趋势 + 拐点检测</text>
+
+  <!-- 中央：5 个 cadence 框 -->
+  <rect x="240" y="50" width="380" height="420" rx="10" fill="#fafaf9" stroke="#d6d3d1" stroke-width="1"/>
+  <text x="430" y="74" font-size="12" font-weight="700" text-anchor="middle" fill="#1c1917">5 种 cadence × 同一个 Agent</text>
+  <text x="430" y="90" font-size="10" text-anchor="middle" fill="#57534e">每个窗口结束触发一次推理</text>
+
+  <!-- cadence 1: 5min 实时 -->
+  <rect x="260" y="105" width="340" height="60" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="280" y="125" font-size="11" font-weight="700" fill="#7f1d1d">⚡ 5 min 实时窗</text>
+  <text x="280" y="142" font-size="10" fill="#991b1b">急性事件：BPSD 激越/焦虑早期信号</text>
+  <text x="280" y="156" font-size="9" fill="#b91c1c">EDA 突升 + HR 突升 + 活动 → 红/黄警报</text>
+
+  <!-- cadence 2: 1h -->
+  <rect x="260" y="175" width="340" height="50" rx="6" fill="#fef3c7" stroke="#ca8a04" stroke-width="1"/>
+  <text x="280" y="194" font-size="11" font-weight="700" fill="#713f12">⏱ 1 hour 短时窗</text>
+  <text x="280" y="210" font-size="10" fill="#854d0e">状态汇总：情绪/活动/HRV/姿态分布</text>
+
+  <!-- cadence 3: 1day -->
+  <rect x="260" y="235" width="340" height="50" rx="6" fill="#fef3c7" stroke="#ca8a04" stroke-width="1"/>
+  <text x="280" y="254" font-size="11" font-weight="700" fill="#713f12">📅 1 day 日窗</text>
+  <text x="280" y="270" font-size="10" fill="#854d0e">日报：睡眠质量、日落综合征、ADL 完成度</text>
+
+  <!-- cadence 4: 1week -->
+  <rect x="260" y="295" width="340" height="50" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="280" y="314" font-size="11" font-weight="700" fill="#14532d">📊 7 day 周窗</text>
+  <text x="280" y="330" font-size="10" fill="#166534">趋势：步速下降斜率、HRV 下行、语速变化</text>
+
+  <!-- cadence 5: 30day -->
+  <rect x="260" y="355" width="340" height="50" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="280" y="374" font-size="11" font-weight="700" fill="#14532d">📈 30 day 月窗</text>
+  <text x="280" y="390" font-size="10" fill="#166534">阶段判断：CCI 综合认知指数、SCD→MCI 拐点</text>
+
+  <!-- 共享 KB -->
+  <rect x="260" y="415" width="340" height="42" rx="6" fill="#0f766e" stroke="#115e59" stroke-width="1.5"/>
+  <text x="430" y="433" font-size="11" font-weight="700" text-anchor="middle" fill="white">所有 cadence 共享同一份 wiki + raw</text>
+  <text x="430" y="448" font-size="9" text-anchor="middle" fill="#ccfbf1">阈值规则、分期标准、原始论文都来自同一处</text>
+
+  <!-- 流入箭头 -->
+  <line x1="212" y1="160" x2="258" y2="135" stroke="#525252" stroke-width="1.2" marker-end="url(#arrR)"/>
+  <line x1="212" y1="180" x2="258" y2="200" stroke="#525252" stroke-width="1.2" marker-end="url(#arrR)"/>
+  <line x1="212" y1="200" x2="258" y2="260" stroke="#525252" stroke-width="1.2" marker-end="url(#arrR)"/>
+  <line x1="212" y1="220" x2="258" y2="320" stroke="#525252" stroke-width="1.2" marker-end="url(#arrR)"/>
+  <line x1="212" y1="240" x2="258" y2="380" stroke="#525252" stroke-width="1.2" marker-end="url(#arrR)"/>
+
+  <!-- 基线 + 历史 → cadence -->
+  <line x1="190" y1="330" x2="258" y2="380" stroke="#10b981" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="190" y1="420" x2="258" y2="380" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <!-- 右：输出 -->
+  <rect x="650" y="50" width="240" height="420" rx="10" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="770" y="74" font-size="13" font-weight="600" text-anchor="middle" fill="#4c1d95">多类输出</text>
+
+  <rect x="666" y="100" width="208" height="56" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+  <text x="770" y="120" font-size="11" font-weight="700" text-anchor="middle" fill="#7f1d1d">⚡ 急性警报</text>
+  <text x="770" y="136" font-size="9" text-anchor="middle" fill="#991b1b">BPSD 1–2hr 提前预警</text>
+  <text x="770" y="148" font-size="9" text-anchor="middle" fill="#991b1b">→ 推送给看护人</text>
+
+  <rect x="666" y="166" width="208" height="50" rx="6" fill="#fef3c7" stroke="#ca8a04" stroke-width="1"/>
+  <text x="770" y="184" font-size="11" font-weight="700" text-anchor="middle" fill="#713f12">⏱ 实时状态板</text>
+  <text x="770" y="200" font-size="9" text-anchor="middle" fill="#854d0e">情绪/活动/HRV 当前数值</text>
+
+  <rect x="666" y="226" width="208" height="50" rx="6" fill="#fef3c7" stroke="#ca8a04" stroke-width="1"/>
+  <text x="770" y="244" font-size="11" font-weight="700" text-anchor="middle" fill="#713f12">📅 每日报告</text>
+  <text x="770" y="260" font-size="9" text-anchor="middle" fill="#854d0e">推给医生 / 家属</text>
+
+  <rect x="666" y="286" width="208" height="50" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="770" y="304" font-size="11" font-weight="700" text-anchor="middle" fill="#14532d">📊 周/月趋势</text>
+  <text x="770" y="320" font-size="9" text-anchor="middle" fill="#166534">长期下降斜率可视化</text>
+
+  <rect x="666" y="346" width="208" height="60" rx="6" fill="#0f766e" stroke="#115e59" stroke-width="1.5"/>
+  <text x="770" y="367" font-size="11" font-weight="700" text-anchor="middle" fill="white">🚨 阶段转化提醒</text>
+  <text x="770" y="383" font-size="9" text-anchor="middle" fill="#ccfbf1">SCD→MCI 拐点检出</text>
+  <text x="770" y="396" font-size="9" text-anchor="middle" fill="#ccfbf1">→ 建议做 PET/血液标志物</text>
+
+  <rect x="666" y="416" width="208" height="40" rx="6" fill="#fafaf9" stroke="#a8a29e" stroke-width="1"/>
+  <text x="770" y="438" font-size="10" text-anchor="middle" fill="#1c1917">医生 dashboard / 家属 App</text>
+
+  <!-- 推理→输出箭头 -->
+  <line x1="600" y1="135" x2="666" y2="128" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrRed)"/>
+  <line x1="600" y1="200" x2="666" y2="190" stroke="#525252" stroke-width="1" marker-end="url(#arrR)"/>
+  <line x1="600" y1="260" x2="666" y2="250" stroke="#525252" stroke-width="1" marker-end="url(#arrR)"/>
+  <line x1="600" y1="320" x2="666" y2="310" stroke="#525252" stroke-width="1" marker-end="url(#arrR)"/>
+  <line x1="600" y1="380" x2="666" y2="376" stroke="#0f766e" stroke-width="1.5" marker-end="url(#arrTeal)"/>
+</svg>
+
+    <div style="font-size: 13px; color: var(--text); margin-top: 14px; line-height: 1.7;">
+      <strong>关键不是"一次推理"，而是同一个 Agent 在 5 种时间尺度上同时运行。</strong>
+      <ul style="margin: 8px 0; padding-left: 22px;">
+        <li><strong>5 min 实时窗 ⚡</strong>：滚动检测 EDA/HR 突变 → BPSD 激越/焦虑 1–2 小时提前预警 → 推送给看护人</li>
+        <li><strong>1 hour 短时窗 ⏱</strong>：状态汇总（情绪/活动/HRV/姿态分布）→ 实时状态板</li>
+        <li><strong>1 day 日窗 📅</strong>：睡眠质量、日落综合征、ADL 完成度 → 日报推给医生</li>
+        <li><strong>7 day 周窗 📊</strong>：步速下降斜率、HRV 下行、语速变化 → 周趋势</li>
+        <li><strong>30 day 月窗 📈</strong>：CCI 综合认知指数、SCD→MCI 拐点 → 阶段转化提醒（建议做 PET / 血液标志物）</li>
+      </ul>
+      <strong>个性化基线（前 2–4 周自动建立）+ 历史评估</strong> 喂给所有 cadence——所以每次判断不是看绝对值，而是看"你相对于自己最近的偏移"。这是为什么 N=4 baseline 也能起步：每个患者建自己的基线，不依赖群体阈值。
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>wiki 内部结构 <span class="muted">5 类内容页 + 4 个治理文件 怎么协作</span></h2>
+  <div class="arch">
+    
+<svg viewBox="0 0 920 520" width="100%" style="max-width: 920px;">
+  <defs>
+    <marker id="arrW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#525252"/>
+    </marker>
+  </defs>
+
+  <text x="460" y="24" font-size="14" font-weight="700" text-anchor="middle" fill="#1c1917">wiki 内部结构：5 类内容页 + 4 个治理文件 怎么协作</text>
+
+  <!-- ===== 治理层（顶部） ===== -->
+  <rect x="40" y="50" width="840" height="100" rx="10" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="460" y="74" font-size="13" font-weight="700" text-anchor="middle" fill="#4c1d95">治理层 · 顶层 4 个文件（管整个 wiki 怎么运转）</text>
+
+  <rect x="60" y="90" width="180" height="50" rx="6" fill="white" stroke="#8b5cf6" stroke-width="1"/>
+  <text x="150" y="108" font-size="11" font-weight="700" text-anchor="middle" fill="#4c1d95">README.md</text>
+  <text x="150" y="124" font-size="9" text-anchor="middle" fill="#5b21b6">"What is this?"</text>
+  <text x="150" y="136" font-size="9" text-anchor="middle" fill="#5b21b6">人入门第一站</text>
+
+  <rect x="260" y="90" width="180" height="50" rx="6" fill="white" stroke="#8b5cf6" stroke-width="1"/>
+  <text x="350" y="108" font-size="11" font-weight="700" text-anchor="middle" fill="#4c1d95">index.md</text>
+  <text x="350" y="124" font-size="9" text-anchor="middle" fill="#5b21b6">"Where is everything?"</text>
+  <text x="350" y="136" font-size="9" text-anchor="middle" fill="#5b21b6">所有页面的目录</text>
+
+  <rect x="460" y="90" width="180" height="50" rx="6" fill="white" stroke="#8b5cf6" stroke-width="1"/>
+  <text x="550" y="108" font-size="11" font-weight="700" text-anchor="middle" fill="#4c1d95">schema.md</text>
+  <text x="550" y="124" font-size="9" text-anchor="middle" fill="#5b21b6">"How to maintain?"</text>
+  <text x="550" y="136" font-size="9" text-anchor="middle" fill="#5b21b6">规则手册（front-matter / 状态）</text>
+
+  <rect x="660" y="90" width="180" height="50" rx="6" fill="white" stroke="#8b5cf6" stroke-width="1"/>
+  <text x="750" y="108" font-size="11" font-weight="700" text-anchor="middle" fill="#4c1d95">log.md</text>
+  <text x="750" y="124" font-size="9" text-anchor="middle" fill="#5b21b6">"What changed when?"</text>
+  <text x="750" y="136" font-size="9" text-anchor="middle" fill="#5b21b6">追加式日志</text>
+
+  <!-- 向下箭头 governs -->
+  <line x1="460" y1="155" x2="460" y2="180" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrW)"/>
+  <text x="475" y="172" font-size="11" fill="#5b21b6">governs ↓</text>
+
+  <!-- ===== 内容层 5 类 ===== -->
+  <text x="460" y="200" font-size="13" font-weight="700" text-anchor="middle" fill="#065f46">内容层 · wiki/ (55 页) — 5 类页面相互引用</text>
+
+  <!-- datasets（顶） -->
+  <rect x="320" y="220" width="280" height="50" rx="6" fill="#fff7ed" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="460" y="240" font-size="12" font-weight="700" text-anchor="middle" fill="#9a3412">datasets/ (7)</text>
+  <text x="460" y="256" font-size="10" text-anchor="middle" fill="#7c2d12">数据集说明 · ground truth / 验证语料</text>
+
+  <line x1="460" y1="272" x2="460" y2="295" stroke="#525252" stroke-width="1.5" marker-end="url(#arrW)"/>
+  <text x="475" y="288" font-size="10" fill="#525252">inform</text>
+
+  <!-- concepts（中央） -->
+  <rect x="320" y="300" width="280" height="55" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="460" y="320" font-size="12" font-weight="700" text-anchor="middle" fill="#065f46">concepts/ (22)</text>
+  <text x="460" y="336" font-size="10" text-anchor="middle" fill="#047857">领域知识：分期 · BPSD · 传感器原理</text>
+  <text x="460" y="350" font-size="10" text-anchor="middle" fill="#047857">这是 KB 的核心</text>
+
+  <!-- methods（左下） -->
+  <rect x="80" y="385" width="240" height="55" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="200" y="405" font-size="12" font-weight="700" text-anchor="middle" fill="#1e3a8a">methods/ (8)</text>
+  <text x="200" y="421" font-size="10" text-anchor="middle" fill="#1e40af">怎么处理数据 · 怎么用 concepts</text>
+  <text x="200" y="435" font-size="10" text-anchor="middle" fill="#1e40af">数据管道 · 阈值 · Agent 接口</text>
+
+  <!-- agents（右下） -->
+  <rect x="600" y="385" width="240" height="55" rx="6" fill="#fef3c7" stroke="#ca8a04" stroke-width="1.5"/>
+  <text x="720" y="405" font-size="12" font-weight="700" text-anchor="middle" fill="#713f12">agents/ (10)</text>
+  <text x="720" y="421" font-size="10" text-anchor="middle" fill="#854d0e">谁在做推理 · 1 active + 7 future</text>
+  <text x="720" y="435" font-size="10" text-anchor="middle" fill="#854d0e">每个 agent 用 concepts + methods</text>
+
+  <line x1="380" y1="356" x2="240" y2="385" stroke="#525252" stroke-width="1.2" marker-end="url(#arrW)"/>
+  <text x="280" y="375" font-size="10" fill="#525252">used by</text>
+  <line x1="540" y1="356" x2="680" y2="385" stroke="#525252" stroke-width="1.2" marker-end="url(#arrW)"/>
+  <text x="615" y="375" font-size="10" fill="#525252">used by</text>
+
+  <line x1="320" y1="412" x2="600" y2="412" stroke="#525252" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="460" y="408" font-size="9" text-anchor="middle" fill="#525252">methods 描述 agents 怎么用 concepts</text>
+
+  <!-- synthesis（底） -->
+  <rect x="240" y="465" width="440" height="40" rx="6" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="460" y="483" font-size="12" font-weight="700" text-anchor="middle" fill="#4c1d95">synthesis/ (8)</text>
+  <text x="460" y="498" font-size="10" text-anchor="middle" fill="#5b21b6">横切论述：项目总览 · 创新点 · what we don't know · 临床→传感器映射</text>
+
+  <line x1="200" y1="440" x2="280" y2="465" stroke="#525252" stroke-width="1" stroke-dasharray="2 2"/>
+  <line x1="720" y1="440" x2="640" y2="465" stroke="#525252" stroke-width="1" stroke-dasharray="2 2"/>
+  <text x="730" y="460" font-size="9" fill="#525252">summarize across all</text>
+</svg>
+
+    <div style="font-size: 13px; color: var(--text); margin-top: 14px; line-height: 1.7;">
+      <strong>治理层（4 文件）管 wiki 怎么运转：</strong>
+      <code>README</code> 是入口、<code>index</code> 是目录、<code>schema</code> 是规则（front-matter / 状态语义 / 维护流程）、<code>log</code> 是历史。任何人想读懂这个 wiki，从这 4 个开始。
+      <br><br>
+      <strong>内容层（55 页）按角色分 5 类：</strong>
+      <ul style="margin: 6px 0; padding-left: 22px;">
+        <li><code>concepts/</code> 是 KB 核心——疾病知识 + 传感器原理。所有判断要回到这里取定义。</li>
+        <li><code>methods/</code> 描述"怎么用 concepts"——数据管道、阈值规则、Agent 接口契约。</li>
+        <li><code>agents/</code> 是"谁在做推理"——1 个 active + 7 个 future。每个 agent 引用 concepts + methods。</li>
+        <li><code>datasets/</code> 是 ground truth 与验证语料——数据本身在 raw/，这里只放说明页。</li>
+        <li><code>synthesis/</code> 是横切论述——项目总览、创新点、"what we don't know" 这种跨多个类别的内容。</li>
+      </ul>
+      <strong>引用关系：</strong> datasets <em>inform</em> concepts；concepts <em>used by</em> methods + agents；synthesis <em>summarizes across all</em>。这就是为什么 dashboard 把它们分这 5 组显示。
+    </div>
+  </div>
+</section>
+
+<section>
   <h2>知识维护循环 <span class="muted">辅助流程 · git 让 wiki 永远是最新版</span></h2>
   <div class="arch" style="padding: 14px;">
     
