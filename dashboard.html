@@ -297,10 +297,10 @@ footer {
 </section>
 
 <section>
-  <h2>工作原理 <span class="muted">这个 wiki 是怎么运转的</span></h2>
+  <h2>工作原理 <span class="muted">Agent 拿到患者数据后怎么结合 raw + wiki 做判断</span></h2>
   <div class="arch">
     
-<svg viewBox="0 0 880 520" width="100%" style="max-width: 880px;">
+<svg viewBox="0 0 920 920" width="100%" style="max-width: 920px;">
   <defs>
     <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#525252"/>
@@ -308,100 +308,179 @@ footer {
     <marker id="arrAccent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
     </marker>
+    <marker id="arrOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/>
+    </marker>
+    <marker id="arrGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#10b981"/>
+    </marker>
   </defs>
 
-  <!-- ========== 你（作者） ========== -->
-  <rect x="40" y="20" width="180" height="60" rx="8" fill="#0f766e" stroke="#0f766e"/>
-  <text x="130" y="48" font-size="14" font-weight="600" text-anchor="middle" fill="white">你</text>
-  <text x="130" y="66" font-size="11" text-anchor="middle" fill="#ccfbf1">作者 / curator</text>
+  <!-- ========== TITLE ========== -->
+  <text x="460" y="28" font-size="14" font-weight="700" text-anchor="middle" fill="#1c1917">推理流程：拿到患者数据 → Agent 结合 wiki + raw → 临床判断</text>
 
-  <!-- ========== 1. 编辑 wiki ========== -->
-  <rect x="280" y="20" width="240" height="60" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
-  <text x="400" y="44" font-size="13" font-weight="600" text-anchor="middle" fill="#065f46">① 编辑 wiki/*.md</text>
-  <text x="400" y="62" font-size="11" text-anchor="middle" fill="#064e3b">concepts / methods / agents / ...</text>
-  <line x1="222" y1="50" x2="278" y2="50" stroke="#0f766e" stroke-width="2" marker-end="url(#arrAccent)"/>
+  <!-- ========== ① 患者佩戴手套 ========== -->
+  <rect x="290" y="50" width="340" height="56" rx="8" fill="#fff7ed" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="460" y="74" font-size="13" font-weight="600" text-anchor="middle" fill="#9a3412">① 患者佩戴智能手套</text>
+  <text x="460" y="92" font-size="11" text-anchor="middle" fill="#7c2d12">EDA · PPG · IMU · 麦克风（实时采集）</text>
 
-  <!-- ========== 2. git push ========== -->
-  <rect x="580" y="20" width="240" height="60" rx="8" fill="#fafaf9" stroke="#a8a29e" stroke-width="1.5"/>
-  <text x="700" y="44" font-size="13" font-weight="600" text-anchor="middle" fill="#1c1917">② git push</text>
-  <text x="700" y="62" font-size="11" text-anchor="middle" fill="#57534e">推到 GitHub main 分支</text>
-  <line x1="522" y1="50" x2="578" y2="50" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="460" y1="108" x2="460" y2="138" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
 
-  <!-- 下行箭头 push → Action -->
-  <line x1="700" y1="82" x2="700" y2="118" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- ========== ② 传感器原始数据 ========== -->
+  <rect x="290" y="140" width="340" height="56" rx="8" fill="#fff7ed" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="460" y="164" font-size="13" font-weight="600" text-anchor="middle" fill="#9a3412">② raw/sensor_data/&lt;患者ID&gt;/</text>
+  <text x="460" y="182" font-size="11" text-anchor="middle" fill="#7c2d12">传感器 CSV：gsr · ppg_ir · hr · imu_axyz · audio</text>
 
-  <!-- ========== 3. GitHub Action ========== -->
-  <rect x="500" y="120" width="320" height="80" rx="8" fill="#fef3c7" stroke="#ca8a04" stroke-width="1.5"/>
-  <text x="660" y="146" font-size="13" font-weight="600" text-anchor="middle" fill="#713f12">③ GitHub Action 触发（约 10 秒）</text>
-  <text x="660" y="166" font-size="11" text-anchor="middle" fill="#854d0e">.github/workflows/build.yml</text>
-  <text x="660" y="184" font-size="11" text-anchor="middle" fill="#854d0e">↳ 跑 build_dashboard.py</text>
+  <line x1="460" y1="198" x2="460" y2="228" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="468" y="218" font-size="10" fill="#525252">code/src/sensors/preprocessing.py</text>
 
-  <!-- 下行箭头 Action → dashboard -->
-  <line x1="660" y1="202" x2="660" y2="238" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- ========== ③ 多模态特征 bundle ========== -->
+  <rect x="240" y="230" width="440" height="80" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="460" y="254" font-size="13" font-weight="600" text-anchor="middle" fill="#1e3a8a">③ 多模态特征 bundle</text>
+  <text x="460" y="274" font-size="11" text-anchor="middle" fill="#1e40af">HRV (SDNN/RMSSD/LF/HF) · gait params · EDA SCL/SCR</text>
+  <text x="460" y="290" font-size="11" text-anchor="middle" fill="#1e40af">voice F0/jitter/MFCC · patient profile · context (time/activity)</text>
 
-  <!-- ========== 4. dashboard.html 生成 ========== -->
-  <rect x="500" y="240" width="320" height="80" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
-  <text x="660" y="266" font-size="13" font-weight="600" text-anchor="middle" fill="#1e3a8a">④ 重新生成 dashboard.html</text>
-  <text x="660" y="286" font-size="11" text-anchor="middle" fill="#1e40af">扫所有 wiki/*.md front-matter</text>
-  <text x="660" y="304" font-size="11" text-anchor="middle" fill="#1e40af">按类别 + 状态徽章渲染</text>
+  <line x1="460" y1="312" x2="460" y2="342" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
 
-  <!-- 下行箭头 dashboard → Pages -->
-  <line x1="660" y1="322" x2="660" y2="358" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- ========== ④ Unified Clinical Agent (核心) ========== -->
+  <rect x="200" y="345" width="520" height="130" rx="10" fill="#0f766e" stroke="#115e59" stroke-width="2"/>
+  <text x="460" y="372" font-size="15" font-weight="700" text-anchor="middle" fill="white">④ Unified Clinical Agent (Claude)</text>
+  <text x="460" y="394" font-size="12" text-anchor="middle" fill="#ccfbf1">读 features bundle → 决定查哪些 KB 条目 → 综合推理</text>
+  <text x="460" y="416" font-size="11" text-anchor="middle" fill="#ccfbf1">code/src/agents/base_agent.py + skills/ad_staging.py</text>
+  <text x="460" y="438" font-size="11" text-anchor="middle" fill="#a7f3d0">↓ 双向查询：wiki 取结构化知识 + raw 取证据</text>
+  <text x="460" y="458" font-size="10" text-anchor="middle" fill="#a7f3d0">每条结论必须能追溯到 wiki 页面 + 原始论文</text>
 
-  <!-- ========== 5. Pages 部署 ========== -->
-  <rect x="500" y="360" width="320" height="80" rx="8" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
-  <text x="660" y="386" font-size="13" font-weight="600" text-anchor="middle" fill="#4c1d95">⑤ Pages 部署（约 30 秒）</text>
-  <text x="660" y="406" font-size="11" text-anchor="middle" fill="#5b21b6">jewelina95.github.io/ad-wiki-pages</text>
-  <text x="660" y="424" font-size="11" text-anchor="middle" fill="#5b21b6">.nojekyll → 原样发布所有 .md</text>
+  <!-- 双向箭头：Agent ↔ wiki -->
+  <line x1="200" y1="410" x2="100" y2="540" stroke="#10b981" stroke-width="2" marker-end="url(#arrGreen)"/>
+  <text x="115" y="475" font-size="11" font-weight="600" fill="#065f46">查 wiki KB</text>
+  <line x1="100" y1="540" x2="200" y2="410" stroke="#10b981" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#arrAccent)"/>
+  <text x="120" y="495" font-size="10" fill="#065f46">返回引用</text>
 
-  <!-- 下行箭头 Pages → 浏览者 -->
-  <line x1="660" y1="442" x2="660" y2="478" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- 双向箭头：Agent ↔ raw -->
+  <line x1="720" y1="410" x2="820" y2="540" stroke="#ea580c" stroke-width="2" marker-end="url(#arrOrange)"/>
+  <text x="745" y="475" font-size="11" font-weight="600" fill="#9a3412">查 raw 证据</text>
+  <line x1="820" y1="540" x2="720" y2="410" stroke="#ea580c" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#arrAccent)"/>
+  <text x="745" y="495" font-size="10" fill="#9a3412">返回原文</text>
 
-  <!-- ========== 6. 浏览者 ========== -->
-  <rect x="500" y="480" width="320" height="32" rx="8" fill="#0f766e" stroke="#0f766e"/>
-  <text x="660" y="500" font-size="12" font-weight="600" text-anchor="middle" fill="white">⑥ 任何人打开 URL → 看到最新版</text>
+  <!-- ========== ⑤ wiki KB（左下） ========== -->
+  <rect x="20" y="540" width="220" height="220" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="130" y="562" font-size="13" font-weight="600" text-anchor="middle" fill="#065f46">⑤ wiki/ — 策展 KB</text>
+  <text x="130" y="580" font-size="10" text-anchor="middle" fill="#047857">医生可编辑的临床手册</text>
+  <text x="35" y="604" font-size="11" font-weight="600" fill="#064e3b">concepts/</text>
+  <text x="35" y="620" font-size="10" fill="#065f46">  AD 分期 · AT(N) · BPSD ×7</text>
+  <text x="35" y="636" font-size="10" fill="#065f46">  EDA / PPG / IMU / 语音原理</text>
+  <text x="35" y="652" font-size="10" fill="#065f46">  MCR · 步态常模 · 用药</text>
+  <text x="35" y="676" font-size="11" font-weight="600" fill="#064e3b">methods/</text>
+  <text x="35" y="692" font-size="10" fill="#065f46">  数据管道 · 阈值标准</text>
+  <text x="35" y="708" font-size="10" fill="#065f46">  Agent 接口契约</text>
+  <text x="35" y="732" font-size="11" font-weight="600" fill="#064e3b">synthesis/</text>
+  <text x="35" y="748" font-size="10" fill="#065f46">  临床→传感器映射</text>
 
-  <!-- ========== 反向：浏览器 fetch commits ========== -->
-  <path d="M 500 496 Q 350 496 350 350 Q 350 250 350 165" stroke="#0f766e" stroke-width="1.5" stroke-dasharray="4 4" fill="none" marker-end="url(#arrAccent)"/>
-  <text x="220" y="320" font-size="11" fill="#0f766e">浏览器载入时</text>
-  <text x="220" y="336" font-size="11" fill="#0f766e">fetch GitHub commits API</text>
-  <text x="220" y="352" font-size="11" fill="#0f766e">→ 「最近修改」面板</text>
+  <!-- ========== ⑥ raw evidence（右下） ========== -->
+  <rect x="680" y="540" width="220" height="220" rx="8" fill="#fff7ed" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="790" y="562" font-size="13" font-weight="600" text-anchor="middle" fill="#9a3412">⑥ raw/ — 原始证据</text>
+  <text x="790" y="580" font-size="10" text-anchor="middle" fill="#b45309">不可变的源材料</text>
+  <text x="695" y="604" font-size="11" font-weight="600" fill="#7c2d12">papers/</text>
+  <text x="695" y="620" font-size="10" fill="#9a3412">  Atri 2024 (AA practice)</text>
+  <text x="695" y="636" font-size="10" fill="#9a3412">  Jack 2024 (AT(N) revised)</text>
+  <text x="695" y="652" font-size="10" fill="#9a3412">  Buracchio 2010 (gait 12y)</text>
+  <text x="695" y="668" font-size="10" fill="#9a3412">  Iaboni 2022 (BPSD AUC)</text>
+  <text x="695" y="692" font-size="11" font-weight="600" fill="#7c2d12">clinical_data/</text>
+  <text x="695" y="708" font-size="10" fill="#9a3412">  T0–T3 longitudinal (脱敏)</text>
+  <text x="695" y="732" font-size="11" font-weight="600" fill="#7c2d12">interviews/</text>
+  <text x="695" y="748" font-size="10" fill="#9a3412">  李医生 26 题访谈</text>
 
-  <!-- ========== 左侧：raw 数据来源 ========== -->
-  <rect x="40" y="120" width="180" height="320" rx="8" fill="#fff7ed" stroke="#fb923c" stroke-width="1.5"/>
-  <text x="130" y="146" font-size="13" font-weight="600" text-anchor="middle" fill="#9a3412">raw/ — 私有素材</text>
-  <text x="130" y="170" font-size="11" text-anchor="middle" fill="#7c2d12">论文 PDF</text>
-  <text x="130" y="188" font-size="11" text-anchor="middle" fill="#7c2d12">采访记录</text>
-  <text x="130" y="206" font-size="11" text-anchor="middle" fill="#7c2d12">临床 xlsx (脱敏)</text>
-  <text x="130" y="224" font-size="11" text-anchor="middle" fill="#7c2d12">传感器 CSV</text>
-  <text x="130" y="246" font-size="11" text-anchor="middle" fill="#7c2d12">━━━━━━━</text>
-  <text x="130" y="270" font-size="10" text-anchor="middle" fill="#9a3412">仅在 private 仓</text>
-  <text x="130" y="286" font-size="10" text-anchor="middle" fill="#9a3412">不上传公开 URL</text>
+  <!-- 中间提示：wiki 与 raw 的关系 -->
+  <rect x="270" y="600" width="380" height="80" rx="6" fill="#fef3c7" stroke="#ca8a04" stroke-width="1"/>
+  <text x="460" y="624" font-size="12" font-weight="600" text-anchor="middle" fill="#713f12">wiki 与 raw 的分工</text>
+  <text x="460" y="644" font-size="10" text-anchor="middle" fill="#854d0e">wiki = 结构化结论（"BPSD 激越的 EDA 阈值是 +30%"）</text>
+  <text x="460" y="660" font-size="10" text-anchor="middle" fill="#854d0e">raw = 原始证据（"这个阈值出自 Iaboni 2022 那篇 PDF"）</text>
+  <text x="460" y="675" font-size="10" text-anchor="middle" fill="#854d0e">每个 wiki 页 front-matter 的 sources: 字段引用 raw 路径</text>
 
-  <text x="130" y="330" font-size="13" font-weight="600" text-anchor="middle" fill="#065f46">wiki/ ← cite</text>
-  <text x="130" y="354" font-size="10" text-anchor="middle" fill="#064e3b">每个 wiki 页有</text>
-  <text x="130" y="370" font-size="10" text-anchor="middle" fill="#064e3b">YAML front-matter:</text>
-  <text x="130" y="386" font-size="10" text-anchor="middle" fill="#064e3b">title / type / status</text>
-  <text x="130" y="402" font-size="10" text-anchor="middle" fill="#064e3b">last_updated / sources</text>
-  <text x="130" y="418" font-size="10" text-anchor="middle" fill="#064e3b">→ 决定 dashboard 显示</text>
+  <!-- ========== ⑦ 输出 ========== -->
+  <line x1="460" y1="775" x2="460" y2="800" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="475" y="790" font-size="10" fill="#525252">综合推理</text>
 
-  <!-- 横线 raw → wiki edit -->
-  <line x1="130" y1="120" x2="130" y2="100" stroke="#a8a29e" stroke-width="1.5"/>
-  <line x1="130" y1="100" x2="278" y2="50" stroke="#a8a29e" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#arr)"/>
-  <text x="160" y="95" font-size="10" fill="#78716c">ingest</text>
+  <rect x="220" y="800" width="480" height="70" rx="8" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="460" y="824" font-size="13" font-weight="600" text-anchor="middle" fill="#4c1d95">⑦ 临床输出</text>
+  <text x="460" y="842" font-size="10" text-anchor="middle" fill="#5b21b6">分期 (SCD/MCI/Mild/Moderate/Severe) + 置信度 · 推理链 + KB/paper 引用</text>
+  <text x="460" y="858" font-size="10" text-anchor="middle" fill="#5b21b6">BPSD 风险标记 · 非药物干预建议 · 何时建议 PET/CSF/血液标志物</text>
+
+  <line x1="460" y1="872" x2="460" y2="898" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <rect x="290" y="900" width="340" height="14" rx="4" fill="#0f766e" stroke="#0f766e"/>
+  <text x="460" y="911" font-size="11" font-weight="600" text-anchor="middle" fill="white">医生 / 看护人 接收</text>
 </svg>
 
     <div class="legend">
-      <span><span class="swatch" style="background:#10b981"></span>编辑 / wiki 策展</span>
-      <span><span class="swatch" style="background:#fef3c7"></span>GitHub Action</span>
-      <span><span class="swatch" style="background:#3b82f6"></span>dashboard 构建</span>
-      <span><span class="swatch" style="background:#f5f3ff"></span>Pages 部署</span>
-      <span><span class="swatch" style="background:#fff7ed"></span>raw 私有源</span>
+      <span><span class="swatch" style="background:#fff7ed"></span>raw 原始数据 / 证据</span>
+      <span><span class="swatch" style="background:#3b82f6"></span>预处理 / 特征</span>
+      <span><span class="swatch" style="background:#0f766e"></span>Agent 推理</span>
+      <span><span class="swatch" style="background:#ecfdf5"></span>wiki 策展 KB</span>
+      <span><span class="swatch" style="background:#f5f3ff"></span>临床输出</span>
     </div>
-    <div style="font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.6;">
-      <strong>从 push 到看到结果约 1 分钟。</strong>
-      工作流：你改 <code>wiki/*.md</code> → <code>git push</code> → GitHub Action（10s）扫所有 front-matter 重生成 <code>dashboard.html</code> → Pages 重新部署（30s）→ 公开 URL 立刻反映新内容。
-      浏览器载入 dashboard 时反向 <code>fetch</code> GitHub commits API → 顶部「最近修改」面板始终显示最新 10 条。
+    <div style="font-size: 13px; color: var(--text); margin-top: 16px; line-height: 1.7;">
+      <strong>七步推理：</strong>
+      <ol style="margin: 8px 0; padding-left: 22px;">
+        <li>患者佩戴手套，4 个传感器实时采集</li>
+        <li>原始数据落到 <code>raw/sensor_data/&lt;患者ID&gt;/</code> 时间序列 CSV</li>
+        <li><code>preprocessing.py</code> 抽特征：HRV、步态、EDA、语音、上下文</li>
+        <li><strong>Unified Clinical Agent</strong>（Claude）拿到 features bundle，决定要查哪些 KB 条目</li>
+        <li>横向查 <code>wiki/concepts/</code>+ <code>methods/</code>+<code>synthesis/</code> 拿结构化结论（阈值、判定规则、鉴别诊断逻辑）</li>
+        <li>纵向查 <code>raw/papers/</code>+ <code>raw/clinical_data/</code> 拿原始证据（论文出处、纵向队列对照）</li>
+        <li>综合推理 → 分期 + 置信度 + 推理链 + KB/paper 引用 + BPSD 风险 + 干预建议 → 发给临床医生/看护</li>
+      </ol>
+      <strong style="color: var(--accent);">关键设计：每条结论必须能追溯到一个 wiki 页面 + 一篇原始论文。</strong>
+      wiki 给"结论是什么"，raw 给"凭什么这么说"。这是这个项目区别于黑盒 AI 的核心。
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>知识维护循环 <span class="muted">辅助流程 · git 让 wiki 永远是最新版</span></h2>
+  <div class="arch" style="padding: 14px;">
+    
+<svg viewBox="0 0 920 100" width="100%" style="max-width: 920px;">
+  <defs>
+    <marker id="arrM" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#78716c"/>
+    </marker>
+  </defs>
+  <text x="460" y="20" font-size="12" font-weight="600" text-anchor="middle" fill="#57534e">辅助循环：知识维护（不影响推理实时性）</text>
+
+  <rect x="20" y="35" width="150" height="50" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
+  <text x="95" y="55" font-size="11" font-weight="600" text-anchor="middle" fill="#065f46">作者编辑</text>
+  <text x="95" y="71" font-size="10" text-anchor="middle" fill="#047857">wiki/*.md</text>
+
+  <line x1="172" y1="60" x2="208" y2="60" stroke="#78716c" stroke-width="1.2" marker-end="url(#arrM)"/>
+
+  <rect x="210" y="35" width="150" height="50" rx="6" fill="#fafaf9" stroke="#a8a29e" stroke-width="1"/>
+  <text x="285" y="55" font-size="11" font-weight="600" text-anchor="middle" fill="#1c1917">git push</text>
+  <text x="285" y="71" font-size="10" text-anchor="middle" fill="#57534e">→ GitHub main</text>
+
+  <line x1="362" y1="60" x2="398" y2="60" stroke="#78716c" stroke-width="1.2" marker-end="url(#arrM)"/>
+
+  <rect x="400" y="35" width="150" height="50" rx="6" fill="#fef3c7" stroke="#ca8a04" stroke-width="1"/>
+  <text x="475" y="55" font-size="11" font-weight="600" text-anchor="middle" fill="#713f12">Action 触发</text>
+  <text x="475" y="71" font-size="10" text-anchor="middle" fill="#854d0e">build_dashboard.py</text>
+
+  <line x1="552" y1="60" x2="588" y2="60" stroke="#78716c" stroke-width="1.2" marker-end="url(#arrM)"/>
+
+  <rect x="590" y="35" width="150" height="50" rx="6" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1"/>
+  <text x="665" y="55" font-size="11" font-weight="600" text-anchor="middle" fill="#4c1d95">Pages 部署</text>
+  <text x="665" y="71" font-size="10" text-anchor="middle" fill="#5b21b6">URL 立即生效</text>
+
+  <line x1="742" y1="60" x2="778" y2="60" stroke="#78716c" stroke-width="1.2" marker-end="url(#arrM)"/>
+
+  <rect x="780" y="35" width="120" height="50" rx="6" fill="#0f766e" stroke="#0f766e"/>
+  <text x="840" y="55" font-size="11" font-weight="600" text-anchor="middle" fill="white">下次推理</text>
+  <text x="840" y="71" font-size="10" text-anchor="middle" fill="#ccfbf1">用最新 wiki</text>
+</svg>
+
+    <div style="font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.6;">
+      作者改 <code>wiki/*.md</code> → <code>git push</code> → GitHub Action（10s）跑 <code>build_dashboard.py</code> 重生 <code>dashboard.html</code> → Pages 部署（30s）→ 这个公开 URL 立刻反映新内容；下一次 Agent 推理自动用最新版 wiki。
+      <strong>从 push 到生效约 1 分钟。</strong>
+      浏览者侧反向逻辑：dashboard 载入时 <code>fetch</code> GitHub commits API → 顶部「最近修改」面板始终显示最新 10 条 commit。
     </div>
   </div>
 </section>
