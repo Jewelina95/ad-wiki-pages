@@ -1,62 +1,65 @@
 ---
-title: Multi-agent architecture overview
+title: Agent architecture — 1 active + 7 future
 type: agent
 last_updated: 2026-04-25
 sources:
-  - raw/source_docs/plan_2026-03-13.md
+  - wiki/agents/unified_clinical_agent.md
   - wiki/synthesis/project_overview.md
   - wiki/entities/mdt_team_template.md
-  - code/src/agents/
 status: draft
 ---
 
-# Multi-agent architecture — 7 specialists + 1 coordinator
+# Agent architecture — 1 active + 7 future
 
-Mirrors the clinical [MDT model](../entities/mdt_team_template.md). Each Agent is one specialty; a coordinator integrates and arbitrates conflicts.
+> 🌱 **Current state:** one [unified clinical analysis agent](unified_clinical_agent.md) handles end-to-end reasoning. The 7-specialist + 1-coordinator design from the original plan is **kept as future architecture** (greyed in dashboard) — to be revisited when real labeled AD wearable data > 100 subjects, or cost/latency/audit pressure justifies the split.
 
 ```
-┌─────────────────────────────────┐
-│   Master Coordinator            │
-│   integration + conflict        │
-│   arbitration + reasoning chain │
-└──────────────┬──────────────────┘
-               │
-   ┌─────┬─────┼─────┬─────┬─────┬─────┐
-   │     │     │     │     │     │     │
- Motor Lang Auto Emot Clin Intv Care
+   NOW                                    FUTURE (status: future, greyed)
+┌──────────────────┐                ┌─────────────────────────────────┐
+│  Unified         │                │   Master Coordinator            │
+│  Clinical        │      →         │   integration + conflict        │
+│  Analysis        │                │   arbitration + reasoning chain │
+│  Agent           │                └──────────────┬──────────────────┘
+│                  │                               │
+│  ↑ KB query      │                   ┌─────┬─────┼─────┬─────┬─────┬─────┐
+│  ↑ all features  │                   │     │     │     │     │     │     │
+└──────────────────┘                 Motor Lang Auto Emot Clin Intv Care
 ```
 
-## Per-agent quick reference
+## Why one agent, not seven (right now)
 
-| Agent | Specialty | Inputs | Outputs |
-|-------|-----------|--------|---------|
-| [Motor-cognitive](motor_cognitive_agent.md) | Rehab + cognitive eval | IMU | Gait/MCR/fall risk |
-| [Language-cognitive](language_cognitive_agent.md) | Cognitive eval + speech-lang therapy | Audio | Acoustic + linguistic + stage signals |
-| [Autonomic](autonomic_agent.md) | Neurology | PPG + EDA | HRV / autonomic balance / sleep |
-| [Emotion-behavior](emotion_behavior_agent.md) | Psychiatry + psychology | EDA + PPG + IMU + voice prosody | BPSD detection + forewarning |
-| [Clinical diagnosis](clinical_diagnosis_agent.md) | Senior geriatrician | All other agents' outputs + medical context | Stage assessment + referral logic |
-| [Intervention](intervention_agent.md) | Therapist (music / cognitive / TCM) | Emotion + clinical outputs + patient profile | Non-pharmacologic intervention plan |
-| [Care management](care_management_agent.md) | GP + care coordinator | All agents | Report assembly + caregiver alerts |
-| [Master coordinator](master_coordinator.md) | MDT chair | All specialist assessments | Integrated diagnosis + reasoning chain |
+The original plan called for 7 specialists + 1 coordinator mirroring an MDT meeting. After implementation reality kicked in:
 
-## Message flow
+1. **Data sparsity.** N=4 healthy baseline subjects; no labeled AD wearable corpus yet. Per-specialty thresholds aren't trainable. A unified agent that reads the KB at inference time gives more leverage per token.
+2. **Modern Claude is capable enough.** Frontier models hold full clinical reasoning + multimodal feature interpretation + KB lookup in one prompt without losing coherence.
+3. **Conflict arbitration is theoretical until conflicts exist.** The MDT-style "specialists disagree → coordinator arbitrates" flow needs actual parallel reasoning to disagree about. With one prompt and one KB, conflicts collapse.
 
-1. Sensor preprocessing emits a `MultimodalFeatures` bundle (per-modality dicts + timestamp).
-2. Specialist agents (Motor, Language, Autonomic, Emotion-behavior) run in parallel — each filters relevant features and produces an `AgentAssessment`.
-3. Clinical diagnosis agent consumes all four specialist outputs + `PatientProfile` + `ContextInfo` + history → integrated stage assessment.
-4. Intervention agent consumes emotion + clinical + profile → recommendation.
-5. Care management agent consumes everything → caregiver-facing report and alerts.
-6. Master coordinator owns the conflict-arbitration step at any point: when two agents disagree on alert level or stage, the coordinator's prompt encodes the MDT-meeting heuristics for resolution.
+The 7-specialist design is **not abandoned** — it's parked as the answer to a future scaling problem. Documentation kept, status: `future`, greyed in dashboard.
 
-## Implementation status
+## When to split back
 
-All 7 specialist agents and the master coordinator are **stubs**. The `BaseAgent.assess()` scaffold + Claude SDK call path is implemented in [`code/src/agents/base_agent.py`](../../code/src/agents/base_agent.py). One real Skill exists ([`code/src/skills/ad_staging.py`](../../code/src/skills/ad_staging.py)).
+Trigger conditions for activating the 7 specialists:
 
-See [What we don't know #3](../synthesis/what_we_dont_know.md) for the implementation gap as a tracked open question.
+- Real labeled AD wearable data > 100 subjects → per-specialty threshold tuning becomes feasible
+- Cost / latency pressure → smaller specialty-specific models cheaper than always-on frontier
+- Audit / regulatory requirement → per-specialty reasoning chains improve traceability
+- Multi-modal data load grows beyond what a single-prompt context window comfortably handles
 
-## Why multi-agent (not a single big prompt)
+## The active agent
 
-- **Knowledge boundary:** each specialty's KB and feature filter is local. Easier to curate and audit.
-- **Conflict surfacing:** disagreement between agents is *informative* (e.g., "elevated HR" — autonomic agent says decline, emotion agent says agitation, clinical agent must arbitrate using context). A monolithic prompt buries this.
-- **Auditability:** each agent emits an `AgentAssessment` with its own reasoning string — the system produces a multi-perspective record per evaluation.
-- **Cost control:** specialists can run on cheaper models; coordinator can be the only one on the top-tier model.
+[`unified_clinical_agent.md`](unified_clinical_agent.md) — single agent, reads the [agent data interface](../methods/agent_data_loader_interface.md) feature bundle, queries the [expert KB](../synthesis/expert_kb_report.md), outputs stage + reasoning + intervention.
+
+Implementation: [`code/src/agents/base_agent.py`](../../code/src/agents/base_agent.py) (Claude SDK scaffold) + [`code/src/skills/ad_staging.py`](../../code/src/skills/ad_staging.py) (the working Skill).
+
+## The 7 future specialists (kept as roadmap)
+
+| Agent | Future role | When to activate |
+|---|---|---|
+| [Motor-cognitive](motor_cognitive_agent.md) | Gait / MCR / tremor specialist | When IMU corpus > 50 subjects |
+| [Language-cognitive](language_cognitive_agent.md) | Speech / linguistic specialist | When ASR pipeline + Chinese voice corpus stabilizes |
+| [Autonomic](autonomic_agent.md) | HRV / EDA specialist | When 24h continuous monitoring data accumulates |
+| [Emotion-behavior](emotion_behavior_agent.md) | BPSD detection specialist | When per-patient personalized model becomes the bottleneck |
+| [Clinical diagnosis](clinical_diagnosis_agent.md) | Senior geriatrician integration | When referral logic complexity exceeds single-prompt capacity |
+| [Intervention](intervention_agent.md) | Music / cognitive / TCM therapist | When intervention library outgrows simple lookup |
+| [Care management](care_management_agent.md) | Caregiver report + alert triage | When end-user UX needs dedicated tone-tuning |
+| [Master coordinator](master_coordinator.md) | MDT chair / conflict arbitration | When ≥3 specialists are active and disagreeing |

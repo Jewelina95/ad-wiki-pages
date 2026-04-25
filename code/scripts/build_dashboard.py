@@ -146,6 +146,7 @@ STATUS_BADGE = {
     "draft": ("draft", "#ca8a04"),
     "working_hypothesis": ("working hypothesis", "#ea580c"),
     "open_question": ("open question", "#dc2626"),
+    "future": ("future", "#94a3b8"),
     "doc": ("doc", "#64748b"),
 }
 
@@ -253,6 +254,9 @@ section { margin-bottom: 8px; }
 }
 .page-row a { color: var(--text); text-decoration: none; flex: 1; }
 .page-row a:hover { color: var(--accent); }
+.page-row.future { opacity: 0.45; }
+.page-row.future a { color: var(--muted); }
+.page-row.future:hover { opacity: 0.8; }
 .badge {
   display: inline-block;
   font-size: 10px;
@@ -482,7 +486,8 @@ def render_pages_section(pages_by_section: dict) -> str:
         out.append(f'<summary>{html.escape(label)} <span class="desc">{html.escape(desc)} · {len(pages)} 页</span></summary>')
         out.append('<div class="body">')
         for p in pages:
-            out.append('<div class="page-row">')
+            row_cls = "page-row future" if p["status"] == "future" else "page-row"
+            out.append(f'<div class="{row_cls}">')
             out.append(f'<a href="{html.escape(p["path"])}">{html.escape(p["title"])}</a>')
             out.append(render_status_badge(p["status"]))
             out.append('</div>')

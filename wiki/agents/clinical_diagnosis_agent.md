@@ -9,7 +9,12 @@ sources:
   - wiki/concepts/ad_staging.md
   - wiki/concepts/atn_framework.md
   - wiki/synthesis/clinical_to_sensor_mapping.md
-status: draft
+status: future
+---
+
+> 🌙 **Status: future / 暂缓.**
+> 当前阶段一个统一的 [Clinical analysis agent](unified_clinical_agent.md) 已经够用——单 prompt + 知识库查询，规模上来或要做亚专科深度时再拆成这个独立 Agent。详见 [_architecture.md](_architecture.md)。
+
 ---
 
 # Clinical diagnosis agent

@@ -107,6 +107,9 @@ section { margin-bottom: 8px; }
 }
 .page-row a { color: var(--text); text-decoration: none; flex: 1; }
 .page-row a:hover { color: var(--accent); }
+.page-row.future { opacity: 0.45; }
+.page-row.future a { color: var(--muted); }
+.page-row.future:hover { opacity: 0.8; }
 .badge {
   display: inline-block;
   font-size: 10px;
@@ -244,7 +247,7 @@ footer {
   <div class="wrap" style="padding: 0;">
     <h1>AD WIKI</h1>
     <p>智能手套（EDA + PPG + IMU + 麦克风）+ 多智能体系统，实时监测 AD 患者状态、判断疾病阶段（SCD→MCI→轻度→中度→重度），并配合非药物干预。</p>
-    <div class="meta">54 个 wiki 页 · 0 个 raw 类别 · 构建于 2026-04-25</div>
+    <div class="meta">55 个 wiki 页 · 0 个 raw 类别 · 构建于 2026-04-25</div>
   </div>
 </header>
 
@@ -404,7 +407,7 @@ footer {
 </section>
 
 <section>
-  <h2>Wiki 页面 <span class="muted">54 页 · 点击展开各类</span></h2>
+  <h2>Wiki 页面 <span class="muted">55 页 · 点击展开各类</span></h2>
   <details class="section-block" >
 <summary>概念 Concepts <span class="desc">领域知识：分期 / BPSD / 传感器原理 · 22 页</span></summary>
 <div class="body">
@@ -534,42 +537,46 @@ footer {
 </div>
 </div></details>
 <details class="section-block" open>
-<summary>智能体 Agents <span class="desc">7 专科 + 1 协调 · 9 页</span></summary>
+<summary>智能体 Agents <span class="desc">7 专科 + 1 协调 · 10 页</span></summary>
 <div class="body">
 <div class="page-row">
-<a href="wiki/agents/_architecture.md">Multi-agent architecture overview</a>
+<a href="wiki/agents/_architecture.md">Agent architecture — 1 active + 7 future</a>
 <span class="badge" style="background:#ca8a04">draft</span>
 </div>
-<div class="page-row">
+<div class="page-row future">
 <a href="wiki/agents/autonomic_agent.md">Autonomic agent</a>
-<span class="badge" style="background:#ca8a04">draft</span>
+<span class="badge" style="background:#94a3b8">future</span>
 </div>
-<div class="page-row">
+<div class="page-row future">
 <a href="wiki/agents/care_management_agent.md">Care management agent</a>
-<span class="badge" style="background:#ca8a04">draft</span>
+<span class="badge" style="background:#94a3b8">future</span>
 </div>
-<div class="page-row">
+<div class="page-row future">
 <a href="wiki/agents/clinical_diagnosis_agent.md">Clinical diagnosis agent</a>
-<span class="badge" style="background:#ca8a04">draft</span>
+<span class="badge" style="background:#94a3b8">future</span>
 </div>
-<div class="page-row">
+<div class="page-row future">
 <a href="wiki/agents/emotion_behavior_agent.md">Emotion-behavior agent</a>
-<span class="badge" style="background:#ca8a04">draft</span>
+<span class="badge" style="background:#94a3b8">future</span>
 </div>
-<div class="page-row">
+<div class="page-row future">
 <a href="wiki/agents/intervention_agent.md">Intervention agent</a>
-<span class="badge" style="background:#ca8a04">draft</span>
+<span class="badge" style="background:#94a3b8">future</span>
 </div>
-<div class="page-row">
+<div class="page-row future">
 <a href="wiki/agents/language_cognitive_agent.md">Language-cognitive agent</a>
-<span class="badge" style="background:#ca8a04">draft</span>
+<span class="badge" style="background:#94a3b8">future</span>
 </div>
 <div class="page-row">
 <a href="wiki/agents/master_coordinator.md">Master Coordinator</a>
 <span class="badge" style="background:#ca8a04">draft</span>
 </div>
-<div class="page-row">
+<div class="page-row future">
 <a href="wiki/agents/motor_cognitive_agent.md">Motor-cognitive agent</a>
+<span class="badge" style="background:#94a3b8">future</span>
+</div>
+<div class="page-row">
+<a href="wiki/agents/unified_clinical_agent.md">Unified clinical analysis agent</a>
 <span class="badge" style="background:#ca8a04">draft</span>
 </div>
 </div></details>

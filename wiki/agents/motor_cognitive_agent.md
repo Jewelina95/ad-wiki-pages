@@ -7,7 +7,12 @@ sources:
   - wiki/concepts/imu_gait.md
   - wiki/concepts/mcr_criteria.md
   - wiki/concepts/gait_norms.md
-status: draft
+status: future
+---
+
+> 🌙 **Status: future / 暂缓.**
+> 当前阶段一个统一的 [Clinical analysis agent](unified_clinical_agent.md) 已经够用——单 prompt + 知识库查询，规模上来或要做亚专科深度时再拆成这个独立 Agent。详见 [_architecture.md](_architecture.md)。
+
 ---
 
 # Motor-cognitive agent
