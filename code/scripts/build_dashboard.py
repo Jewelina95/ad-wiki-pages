@@ -373,46 +373,95 @@ footer {
 
 
 ARCH_SVG = """
-<svg viewBox="0 0 800 360" width="100%" style="max-width: 800px;">
-  <!-- Layer boxes -->
-  <rect x="40" y="40" width="220" height="280" rx="8" fill="#fff7ed" stroke="#fb923c" stroke-width="1.5"/>
-  <text x="150" y="62" font-size="13" font-weight="600" text-anchor="middle" fill="#9a3412">raw/ — 不可变素材</text>
-  <text x="150" y="92" font-size="11" text-anchor="middle" fill="#7c2d12">papers (10)</text>
-  <text x="150" y="110" font-size="11" text-anchor="middle" fill="#7c2d12">interviews (1)</text>
-  <text x="150" y="128" font-size="11" text-anchor="middle" fill="#7c2d12">presentations (2)</text>
-  <text x="150" y="146" font-size="11" text-anchor="middle" fill="#7c2d12">clinical_data (10)</text>
-  <text x="150" y="164" font-size="11" text-anchor="middle" fill="#7c2d12">sensor_data (~100)</text>
-  <text x="150" y="182" font-size="11" text-anchor="middle" fill="#7c2d12">templates / archives</text>
-
-  <rect x="290" y="40" width="220" height="280" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
-  <text x="400" y="62" font-size="13" font-weight="600" text-anchor="middle" fill="#065f46">wiki/ — 策展知识</text>
-  <text x="400" y="92" font-size="11" text-anchor="middle" fill="#064e3b">entities (6)</text>
-  <text x="400" y="110" font-size="11" text-anchor="middle" fill="#064e3b">concepts (22)</text>
-  <text x="400" y="128" font-size="11" text-anchor="middle" fill="#064e3b">methods (8)</text>
-  <text x="400" y="146" font-size="11" text-anchor="middle" fill="#064e3b">agents (9)</text>
-  <text x="400" y="164" font-size="11" text-anchor="middle" fill="#064e3b">synthesis (8)</text>
-  <text x="400" y="182" font-size="11" text-anchor="middle" fill="#064e3b">datasets (7)</text>
-  <text x="400" y="200" font-size="11" text-anchor="middle" fill="#064e3b">meetings (3)</text>
-  <text x="400" y="218" font-size="11" text-anchor="middle" fill="#064e3b">deliverables (15)</text>
-
-  <rect x="540" y="40" width="220" height="280" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
-  <text x="650" y="62" font-size="13" font-weight="600" text-anchor="middle" fill="#1e3a8a">code/ — 实现</text>
-  <text x="650" y="92" font-size="11" text-anchor="middle" fill="#1e40af">src/agents/ (8 stub + base)</text>
-  <text x="650" y="110" font-size="11" text-anchor="middle" fill="#1e40af">src/sensors/ (实现)</text>
-  <text x="650" y="128" font-size="11" text-anchor="middle" fill="#1e40af">src/skills/ad_staging</text>
-  <text x="650" y="146" font-size="11" text-anchor="middle" fill="#1e40af">scripts/ + legacy/</text>
-  <text x="650" y="164" font-size="11" text-anchor="middle" fill="#1e40af">kb_loader/ + JSON KB</text>
-
-  <!-- Arrows -->
+<svg viewBox="0 0 880 520" width="100%" style="max-width: 880px;">
   <defs>
-    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#525252"/>
     </marker>
+    <marker id="arrAccent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+    </marker>
   </defs>
-  <line x1="262" y1="180" x2="288" y2="180" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
-  <line x1="512" y1="180" x2="538" y2="180" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
-  <text x="275" y="172" font-size="10" text-anchor="middle" fill="#525252">cite</text>
-  <text x="525" y="172" font-size="10" text-anchor="middle" fill="#525252">cite</text>
+
+  <!-- ========== 你（作者） ========== -->
+  <rect x="40" y="20" width="180" height="60" rx="8" fill="#0f766e" stroke="#0f766e"/>
+  <text x="130" y="48" font-size="14" font-weight="600" text-anchor="middle" fill="white">你</text>
+  <text x="130" y="66" font-size="11" text-anchor="middle" fill="#ccfbf1">作者 / curator</text>
+
+  <!-- ========== 1. 编辑 wiki ========== -->
+  <rect x="280" y="20" width="240" height="60" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="400" y="44" font-size="13" font-weight="600" text-anchor="middle" fill="#065f46">① 编辑 wiki/*.md</text>
+  <text x="400" y="62" font-size="11" text-anchor="middle" fill="#064e3b">concepts / methods / agents / ...</text>
+  <line x1="222" y1="50" x2="278" y2="50" stroke="#0f766e" stroke-width="2" marker-end="url(#arrAccent)"/>
+
+  <!-- ========== 2. git push ========== -->
+  <rect x="580" y="20" width="240" height="60" rx="8" fill="#fafaf9" stroke="#a8a29e" stroke-width="1.5"/>
+  <text x="700" y="44" font-size="13" font-weight="600" text-anchor="middle" fill="#1c1917">② git push</text>
+  <text x="700" y="62" font-size="11" text-anchor="middle" fill="#57534e">推到 GitHub main 分支</text>
+  <line x1="522" y1="50" x2="578" y2="50" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- 下行箭头 push → Action -->
+  <line x1="700" y1="82" x2="700" y2="118" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ========== 3. GitHub Action ========== -->
+  <rect x="500" y="120" width="320" height="80" rx="8" fill="#fef3c7" stroke="#ca8a04" stroke-width="1.5"/>
+  <text x="660" y="146" font-size="13" font-weight="600" text-anchor="middle" fill="#713f12">③ GitHub Action 触发（约 10 秒）</text>
+  <text x="660" y="166" font-size="11" text-anchor="middle" fill="#854d0e">.github/workflows/build.yml</text>
+  <text x="660" y="184" font-size="11" text-anchor="middle" fill="#854d0e">↳ 跑 build_dashboard.py</text>
+
+  <!-- 下行箭头 Action → dashboard -->
+  <line x1="660" y1="202" x2="660" y2="238" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ========== 4. dashboard.html 生成 ========== -->
+  <rect x="500" y="240" width="320" height="80" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="660" y="266" font-size="13" font-weight="600" text-anchor="middle" fill="#1e3a8a">④ 重新生成 dashboard.html</text>
+  <text x="660" y="286" font-size="11" text-anchor="middle" fill="#1e40af">扫所有 wiki/*.md front-matter</text>
+  <text x="660" y="304" font-size="11" text-anchor="middle" fill="#1e40af">按类别 + 状态徽章渲染</text>
+
+  <!-- 下行箭头 dashboard → Pages -->
+  <line x1="660" y1="322" x2="660" y2="358" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ========== 5. Pages 部署 ========== -->
+  <rect x="500" y="360" width="320" height="80" rx="8" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="660" y="386" font-size="13" font-weight="600" text-anchor="middle" fill="#4c1d95">⑤ Pages 部署（约 30 秒）</text>
+  <text x="660" y="406" font-size="11" text-anchor="middle" fill="#5b21b6">jewelina95.github.io/ad-wiki-pages</text>
+  <text x="660" y="424" font-size="11" text-anchor="middle" fill="#5b21b6">.nojekyll → 原样发布所有 .md</text>
+
+  <!-- 下行箭头 Pages → 浏览者 -->
+  <line x1="660" y1="442" x2="660" y2="478" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ========== 6. 浏览者 ========== -->
+  <rect x="500" y="480" width="320" height="32" rx="8" fill="#0f766e" stroke="#0f766e"/>
+  <text x="660" y="500" font-size="12" font-weight="600" text-anchor="middle" fill="white">⑥ 任何人打开 URL → 看到最新版</text>
+
+  <!-- ========== 反向：浏览器 fetch commits ========== -->
+  <path d="M 500 496 Q 350 496 350 350 Q 350 250 350 165" stroke="#0f766e" stroke-width="1.5" stroke-dasharray="4 4" fill="none" marker-end="url(#arrAccent)"/>
+  <text x="220" y="320" font-size="11" fill="#0f766e">浏览器载入时</text>
+  <text x="220" y="336" font-size="11" fill="#0f766e">fetch GitHub commits API</text>
+  <text x="220" y="352" font-size="11" fill="#0f766e">→ 「最近修改」面板</text>
+
+  <!-- ========== 左侧：raw 数据来源 ========== -->
+  <rect x="40" y="120" width="180" height="320" rx="8" fill="#fff7ed" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="130" y="146" font-size="13" font-weight="600" text-anchor="middle" fill="#9a3412">raw/ — 私有素材</text>
+  <text x="130" y="170" font-size="11" text-anchor="middle" fill="#7c2d12">论文 PDF</text>
+  <text x="130" y="188" font-size="11" text-anchor="middle" fill="#7c2d12">采访记录</text>
+  <text x="130" y="206" font-size="11" text-anchor="middle" fill="#7c2d12">临床 xlsx (脱敏)</text>
+  <text x="130" y="224" font-size="11" text-anchor="middle" fill="#7c2d12">传感器 CSV</text>
+  <text x="130" y="246" font-size="11" text-anchor="middle" fill="#7c2d12">━━━━━━━</text>
+  <text x="130" y="270" font-size="10" text-anchor="middle" fill="#9a3412">仅在 private 仓</text>
+  <text x="130" y="286" font-size="10" text-anchor="middle" fill="#9a3412">不上传公开 URL</text>
+
+  <text x="130" y="330" font-size="13" font-weight="600" text-anchor="middle" fill="#065f46">wiki/ ← cite</text>
+  <text x="130" y="354" font-size="10" text-anchor="middle" fill="#064e3b">每个 wiki 页有</text>
+  <text x="130" y="370" font-size="10" text-anchor="middle" fill="#064e3b">YAML front-matter:</text>
+  <text x="130" y="386" font-size="10" text-anchor="middle" fill="#064e3b">title / type / status</text>
+  <text x="130" y="402" font-size="10" text-anchor="middle" fill="#064e3b">last_updated / sources</text>
+  <text x="130" y="418" font-size="10" text-anchor="middle" fill="#064e3b">→ 决定 dashboard 显示</text>
+
+  <!-- 横线 raw → wiki edit -->
+  <line x1="130" y1="120" x2="130" y2="100" stroke="#a8a29e" stroke-width="1.5"/>
+  <line x1="130" y1="100" x2="278" y2="50" stroke="#a8a29e" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#arr)"/>
+  <text x="160" y="95" font-size="10" fill="#78716c">ingest</text>
 </svg>
 """
 
@@ -534,18 +583,20 @@ def main():
 </section>
 
 <section>
-  <h2>开放问题 <span class="muted">必须看见的不确定性</span></h2>
-  {render_oqs()}
-</section>
-
-<section>
-  <h2>架构 <span class="muted">三层 + Agent 拓扑</span></h2>
+  <h2>工作原理 <span class="muted">这个 wiki 是怎么运转的</span></h2>
   <div class="arch">
     {ARCH_SVG}
     <div class="legend">
-      <span><span class="swatch" style="background:#fb923c"></span>raw 不可变</span>
-      <span><span class="swatch" style="background:#10b981"></span>wiki 策展</span>
-      <span><span class="swatch" style="background:#3b82f6"></span>code 实现</span>
+      <span><span class="swatch" style="background:#10b981"></span>编辑 / wiki 策展</span>
+      <span><span class="swatch" style="background:#fef3c7"></span>GitHub Action</span>
+      <span><span class="swatch" style="background:#3b82f6"></span>dashboard 构建</span>
+      <span><span class="swatch" style="background:#f5f3ff"></span>Pages 部署</span>
+      <span><span class="swatch" style="background:#fff7ed"></span>raw 私有源</span>
+    </div>
+    <div style="font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.6;">
+      <strong>从 push 到看到结果约 1 分钟。</strong>
+      工作流：你改 <code>wiki/*.md</code> → <code>git push</code> → GitHub Action（10s）扫所有 front-matter 重生成 <code>dashboard.html</code> → Pages 重新部署（30s）→ 公开 URL 立刻反映新内容。
+      浏览器载入 dashboard 时反向 <code>fetch</code> GitHub commits API → 顶部「最近修改」面板始终显示最新 10 条。
     </div>
   </div>
 </section>
@@ -558,6 +609,11 @@ def main():
 <section>
   <h2>raw/ 清单 <span class="muted">不可变素材</span></h2>
   {render_raw(raw_inv)}
+</section>
+
+<section>
+  <h2>开放问题 <span class="muted">不确定性 / 待解决</span></h2>
+  {render_oqs()}
 </section>
 
 <section>
