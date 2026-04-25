@@ -99,16 +99,22 @@ CORE_ASSETS = [
         "tag": "现可用",
     },
     {
+        "name": "📋 工作流汇报（中文）",
+        "desc": "11 节项目汇报 · 给老师看的 portfolio 文档 · 工作原理 + 现状 + 下一步",
+        "link": "wiki/synthesis/项目工作流汇报_2026-04-25.md",
+        "tag": "可分享",
+    },
+    {
         "name": "专家知识库设计",
         "desc": "5 目录 / 7 段格式 / 医生可编辑的临床手册式 KB，已和临床团队对齐",
         "link": "wiki/synthesis/expert_kb_report.md",
         "tag": "已就绪",
     },
     {
-        "name": "OpenNeuro 合成数据源",
-        "desc": "用于 v1 合成数据校准（IMU 退化幅度、量表分布、SCD 早期建模等）",
-        "link": "wiki/methods/synthetic_data_review.md",
-        "tag": "待登记数据集 ID",
+        "name": "外部数据集校准（v1）",
+        "desc": "5 OpenNeuro 数据集已下载 + 分布提取完成，正在做合成数据 v1 校准",
+        "link": "wiki/methods/synthetic_data_v1_plan.md",
+        "tag": "进行中",
     },
     {
         "name": "Clinical advisor consultation",
@@ -139,6 +145,7 @@ SECTION_LABELS = {
     "agents": ("智能体 Agents", "7 专科 + 1 协调"),
     "synthesis": ("综合 Synthesis", "横切论述与开放问题"),
     "datasets": ("数据集 Datasets", "raw 数据的说明页"),
+    "datasets/external": ("外部数据集 External", "OpenNeuro / 公开队列校准源"),
     "meetings": ("会议 Meetings", "按日期"),
     "deliverables/funding": ("交付：申请书 Funding", "IIT / NHS / 政府 one-pager"),
     "deliverables/ethics": ("交付：伦理 Ethics", "Imperial portal + 4 个表单"),
@@ -146,6 +153,32 @@ SECTION_LABELS = {
 }
 
 SECTION_ORDER = list(SECTION_LABELS.keys())
+
+# === 数据状态清单（dashboard 用）===
+DATA_STATUS = [
+    # downloaded / processed
+    {"name": "ds004504", "status": "ok", "tag": "✅ 已下载+提取", "modality": "EEG · AD/FTD/Healthy", "n": "88"},
+    {"name": "ds007427", "status": "ok", "tag": "✅ 已下载+提取", "modality": "EEG · 家族性 AD", "n": "138"},
+    {"name": "ds006095", "status": "ok", "tag": "✅ 已下载", "modality": "★ IMU + EEG + EMG 老年", "n": "71"},
+    {"name": "ds004796", "status": "ok", "tag": "✅ 已下载", "modality": "EEG + APOE + 生活方式", "n": "192"},
+    {"name": "ds002778", "status": "ok", "tag": "✅ 已下载", "modality": "EEG · PD vs Healthy", "n": "31"},
+    {"name": "MultiConAD", "status": "ok", "tag": "✅ 已下载", "modality": "中文+英文语音对话", "n": "16 datasets"},
+    {"name": "Baseline 4.8 (S01-S04)", "status": "ok", "tag": "✅ 已采集", "modality": "EDA+PPG+IMU 自采", "n": "4 (年轻健康)"},
+    {"name": "数据库汇总 2026-04-18", "status": "ok", "tag": "✅ 已收到", "modality": "T0–T3 临床纵向", "n": "10 xlsx"},
+
+    # in progress
+    {"name": "WearGait-PD", "status": "warn", "tag": "⏳ 待下载", "modality": "★ 13 IMU + 鞋垫", "n": "100 PD + 85 ctrl"},
+    {"name": "Clinical Gait DS", "status": "warn", "tag": "⏳ 待下载", "modality": "4 IMU 多病种", "n": "260"},
+    {"name": "TAUKADIAL 2024", "status": "warn", "tag": "⏳ 待下载", "modality": "中文语音", "n": "—"},
+
+    # planned
+    {"name": "OASIS-3", "status": "plan", "tag": "📝 待申请 (1-2 周)", "modality": "MRI + 30 年纵向", "n": "1098"},
+    {"name": "ADNI", "status": "plan", "tag": "🚫 paper 阶段再申", "modality": "金标准 PET/CSF", "n": "数千"},
+
+    # gap
+    {"name": "真实 AD 患者可穿戴数据", "status": "gap", "tag": "❌ 缺失", "modality": "需伦理 + 招募", "n": "0"},
+    {"name": "整合手套硬件原型", "status": "gap", "tag": "🔧 设计中", "modality": "EDA+PPG+IMU+mic", "n": "0 (ESP32 音频已通)"},
+]
 
 STATUS_BADGE = {
     "settled": ("settled", "#16a34a"),
@@ -369,6 +402,30 @@ footer {
   font-size: 12px; color: var(--muted); margin-left: 8px;
 }
 .refresh-btn:hover { background: var(--bg); color: var(--text); }
+
+/* === 数据状态面板 === */
+.data-status-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.data-status-cell {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px 14px; border-left-width: 4px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.data-status-cell.ok { border-left-color: #16a34a; }
+.data-status-cell.warn { border-left-color: #ca8a04; }
+.data-status-cell.plan { border-left-color: #8b5cf6; }
+.data-status-cell.gap { border-left-color: #dc2626; }
+.data-status-cell .ds-name { font-weight: 600; font-size: 13px; }
+.data-status-cell .ds-tag { font-size: 11px; color: var(--muted); }
+.data-status-cell .ds-meta { font-size: 11px; color: var(--text); margin-top: 2px; }
+.data-status-summary {
+  display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px;
+  color: var(--muted); margin-bottom: 12px; padding: 10px 14px;
+  background: #f8fafc; border-radius: 6px;
+}
+.data-status-summary span strong { color: var(--text); font-size: 14px; }
 .arch {
   background: var(--card); border: 1px solid var(--border); border-radius: 8px;
   padding: 20px; overflow-x: auto;
@@ -816,6 +873,30 @@ def render_raw(inv: dict) -> str:
     return "\n".join(out)
 
 
+def render_data_status() -> str:
+    counts = {"ok": 0, "warn": 0, "plan": 0, "gap": 0}
+    for d in DATA_STATUS:
+        counts[d["status"]] += 1
+    summary = (
+        f'<div class="data-status-summary">'
+        f'<span><strong>{counts["ok"]}</strong> 已获取</span>'
+        f'<span><strong>{counts["warn"]}</strong> 待下载/处理</span>'
+        f'<span><strong>{counts["plan"]}</strong> 已规划 / 待申请</span>'
+        f'<span><strong>{counts["gap"]}</strong> 关键缺口</span>'
+        f'</div>'
+    )
+    cells = []
+    for d in DATA_STATUS:
+        cells.append(
+            f'<div class="data-status-cell {d["status"]}">'
+            f'  <div class="ds-name">{html.escape(d["name"])}</div>'
+            f'  <div class="ds-tag">{html.escape(d["tag"])}</div>'
+            f'  <div class="ds-meta">{html.escape(d["modality"])} · n={html.escape(d["n"])}</div>'
+            f'</div>'
+        )
+    return summary + '<div class="data-status-grid">' + "".join(cells) + '</div>'
+
+
 def main():
     pages_by_section = collect_pages()
     raw_inv = inventory_raw()
@@ -952,6 +1033,16 @@ def main():
 <section>
   <h2>Wiki 页面 <span class="muted">{total_pages} 页 · 点击展开各类</span></h2>
   {render_pages_section(pages_by_section)}
+</section>
+
+<section>
+  <h2>数据状态 <span class="muted">手上有什么 · 缺什么 · 在等什么</span></h2>
+  {render_data_status()}
+  <div style="font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.6;">
+    详见 <a href="wiki/datasets/external/_external_datasets_registry.md">外部数据集登记</a> ·
+    <a href="wiki/methods/synthetic_data_v1_plan.md">合成数据 v1 校准计划</a> ·
+    <a href="wiki/synthesis/hardware_roadmap.md">硬件路线图</a>
+  </div>
 </section>
 
 <section>

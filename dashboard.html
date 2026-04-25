@@ -216,6 +216,30 @@ footer {
   font-size: 12px; color: var(--muted); margin-left: 8px;
 }
 .refresh-btn:hover { background: var(--bg); color: var(--text); }
+
+/* === 数据状态面板 === */
+.data-status-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.data-status-cell {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px 14px; border-left-width: 4px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.data-status-cell.ok { border-left-color: #16a34a; }
+.data-status-cell.warn { border-left-color: #ca8a04; }
+.data-status-cell.plan { border-left-color: #8b5cf6; }
+.data-status-cell.gap { border-left-color: #dc2626; }
+.data-status-cell .ds-name { font-weight: 600; font-size: 13px; }
+.data-status-cell .ds-tag { font-size: 11px; color: var(--muted); }
+.data-status-cell .ds-meta { font-size: 11px; color: var(--text); margin-top: 2px; }
+.data-status-summary {
+  display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px;
+  color: var(--muted); margin-bottom: 12px; padding: 10px 14px;
+  background: #f8fafc; border-radius: 6px;
+}
+.data-status-summary span strong { color: var(--text); font-size: 14px; }
 .arch {
   background: var(--card); border: 1px solid var(--border); border-radius: 8px;
   padding: 20px; overflow-x: auto;
@@ -247,7 +271,7 @@ footer {
   <div class="wrap" style="padding: 0;">
     <h1>AD WIKI</h1>
     <p>智能手套（EDA + PPG + IMU + 麦克风）+ 多智能体系统，实时监测 AD 患者状态、判断疾病阶段（SCD→MCI→轻度→中度→重度），并配合非药物干预。</p>
-    <div class="meta">56 个 wiki 页 · 0 个 raw 类别 · 构建于 2026-04-25</div>
+    <div class="meta">59 个 wiki 页 · 0 个 raw 类别 · 构建于 2026-04-25</div>
   </div>
 </header>
 
@@ -265,6 +289,13 @@ footer {
 </div>
 
 <div class="card">
+  <h3>📋 工作流汇报（中文）</h3>
+  <p>11 节项目汇报 · 给老师看的 portfolio 文档 · 工作原理 + 现状 + 下一步</p>
+  <span class="tag">可分享</span>
+  <div style="margin-top:10px"><a href="wiki/synthesis/项目工作流汇报_2026-04-25.md">查看 →</a></div>
+</div>
+
+<div class="card">
   <h3>专家知识库设计</h3>
   <p>5 目录 / 7 段格式 / 医生可编辑的临床手册式 KB，已和临床团队对齐</p>
   <span class="tag">已就绪</span>
@@ -272,10 +303,10 @@ footer {
 </div>
 
 <div class="card">
-  <h3>OpenNeuro 合成数据源</h3>
-  <p>用于 v1 合成数据校准（IMU 退化幅度、量表分布、SCD 早期建模等）</p>
-  <span class="tag">待登记数据集 ID</span>
-  <div style="margin-top:10px"><a href="wiki/methods/synthetic_data_review.md">查看 →</a></div>
+  <h3>外部数据集校准（v1）</h3>
+  <p>5 OpenNeuro 数据集已下载 + 分布提取完成，正在做合成数据 v1 校准</p>
+  <span class="tag">进行中</span>
+  <div style="margin-top:10px"><a href="wiki/methods/synthetic_data_v1_plan.md">查看 →</a></div>
 </div>
 
 <div class="card">
@@ -741,7 +772,7 @@ footer {
 </section>
 
 <section>
-  <h2>Wiki 页面 <span class="muted">56 页 · 点击展开各类</span></h2>
+  <h2>Wiki 页面 <span class="muted">59 页 · 点击展开各类</span></h2>
   <details class="section-block" >
 <summary>概念 Concepts <span class="desc">领域知识：分期 / BPSD / 传感器原理 · 22 页</span></summary>
 <div class="body">
@@ -835,7 +866,7 @@ footer {
 </div>
 </div></details>
 <details class="section-block" >
-<summary>方法 Methods <span class="desc">数据管道 / 预处理 / 合成数据 / 推理模式 · 8 页</span></summary>
+<summary>方法 Methods <span class="desc">数据管道 / 预处理 / 合成数据 / 推理模式 · 9 页</span></summary>
 <div class="body">
 <div class="page-row">
 <a href="wiki/methods/_data_interface_storage_v1.md">data interface storage v1</a>
@@ -867,6 +898,10 @@ footer {
 </div>
 <div class="page-row">
 <a href="wiki/methods/synthetic_data_v0_rules.md">AD-SensorDataFactory 合成数据生成器设计方案 (v0)</a>
+<span class="badge" style="background:#ea580c">working hypothesis</span>
+</div>
+<div class="page-row">
+<a href="wiki/methods/synthetic_data_v1_plan.md">合成数据 v1 校准计划</a>
 <span class="badge" style="background:#ea580c">working hypothesis</span>
 </div>
 </div></details>
@@ -915,7 +950,7 @@ footer {
 </div>
 </div></details>
 <details class="section-block" open>
-<summary>综合 Synthesis <span class="desc">横切论述与开放问题 · 9 页</span></summary>
+<summary>综合 Synthesis <span class="desc">横切论述与开放问题 · 10 页</span></summary>
 <div class="body">
 <div class="page-row">
 <a href="wiki/synthesis/clinical_to_sensor_mapping.md">Clinical-to-sensor mapping (stage transitions)</a>
@@ -924,6 +959,10 @@ footer {
 <div class="page-row">
 <a href="wiki/synthesis/expert_kb_report.md">expert kb report</a>
 <span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
+<a href="wiki/synthesis/hardware_roadmap.md">硬件路线图 / 原型状态</a>
+<span class="badge" style="background:#ca8a04">draft</span>
 </div>
 <div class="page-row">
 <a href="wiki/synthesis/innovation_thesis.md">innovation thesis</a>
@@ -955,7 +994,7 @@ footer {
 </div>
 </div></details>
 <details class="section-block" >
-<summary>数据集 Datasets <span class="desc">raw 数据的说明页 · 7 页</span></summary>
+<summary>数据集 Datasets <span class="desc">raw 数据的说明页 · 8 页</span></summary>
 <div class="body">
 <div class="page-row">
 <a href="wiki/datasets/_pilot_3.30_30min_protocol.md">pilot 3.30 30min protocol</a>
@@ -974,6 +1013,10 @@ footer {
 <span class="badge" style="background:#ca8a04">draft</span>
 </div>
 <div class="page-row">
+<a href="wiki/datasets/external/_external_datasets_registry.md">外部公开数据集登记</a>
+<span class="badge" style="background:#16a34a">settled</span>
+</div>
+<div class="page-row">
 <a href="wiki/datasets/pilot_3.20.md">Pilot 3.20 — early collection</a>
 <span class="badge" style="background:#16a34a">settled</span>
 </div>
@@ -986,6 +1029,16 @@ footer {
 <span class="badge" style="background:#ea580c">working hypothesis</span>
 </div>
 </div></details>
+</section>
+
+<section>
+  <h2>数据状态 <span class="muted">手上有什么 · 缺什么 · 在等什么</span></h2>
+  <div class="data-status-summary"><span><strong>8</strong> 已获取</span><span><strong>3</strong> 待下载/处理</span><span><strong>2</strong> 已规划 / 待申请</span><span><strong>2</strong> 关键缺口</span></div><div class="data-status-grid"><div class="data-status-cell ok">  <div class="ds-name">ds004504</div>  <div class="ds-tag">✅ 已下载+提取</div>  <div class="ds-meta">EEG · AD/FTD/Healthy · n=88</div></div><div class="data-status-cell ok">  <div class="ds-name">ds007427</div>  <div class="ds-tag">✅ 已下载+提取</div>  <div class="ds-meta">EEG · 家族性 AD · n=138</div></div><div class="data-status-cell ok">  <div class="ds-name">ds006095</div>  <div class="ds-tag">✅ 已下载</div>  <div class="ds-meta">★ IMU + EEG + EMG 老年 · n=71</div></div><div class="data-status-cell ok">  <div class="ds-name">ds004796</div>  <div class="ds-tag">✅ 已下载</div>  <div class="ds-meta">EEG + APOE + 生活方式 · n=192</div></div><div class="data-status-cell ok">  <div class="ds-name">ds002778</div>  <div class="ds-tag">✅ 已下载</div>  <div class="ds-meta">EEG · PD vs Healthy · n=31</div></div><div class="data-status-cell ok">  <div class="ds-name">MultiConAD</div>  <div class="ds-tag">✅ 已下载</div>  <div class="ds-meta">中文+英文语音对话 · n=16 datasets</div></div><div class="data-status-cell ok">  <div class="ds-name">Baseline 4.8 (S01-S04)</div>  <div class="ds-tag">✅ 已采集</div>  <div class="ds-meta">EDA+PPG+IMU 自采 · n=4 (年轻健康)</div></div><div class="data-status-cell ok">  <div class="ds-name">数据库汇总 2026-04-18</div>  <div class="ds-tag">✅ 已收到</div>  <div class="ds-meta">T0–T3 临床纵向 · n=10 xlsx</div></div><div class="data-status-cell warn">  <div class="ds-name">WearGait-PD</div>  <div class="ds-tag">⏳ 待下载</div>  <div class="ds-meta">★ 13 IMU + 鞋垫 · n=100 PD + 85 ctrl</div></div><div class="data-status-cell warn">  <div class="ds-name">Clinical Gait DS</div>  <div class="ds-tag">⏳ 待下载</div>  <div class="ds-meta">4 IMU 多病种 · n=260</div></div><div class="data-status-cell warn">  <div class="ds-name">TAUKADIAL 2024</div>  <div class="ds-tag">⏳ 待下载</div>  <div class="ds-meta">中文语音 · n=—</div></div><div class="data-status-cell plan">  <div class="ds-name">OASIS-3</div>  <div class="ds-tag">📝 待申请 (1-2 周)</div>  <div class="ds-meta">MRI + 30 年纵向 · n=1098</div></div><div class="data-status-cell plan">  <div class="ds-name">ADNI</div>  <div class="ds-tag">🚫 paper 阶段再申</div>  <div class="ds-meta">金标准 PET/CSF · n=数千</div></div><div class="data-status-cell gap">  <div class="ds-name">真实 AD 患者可穿戴数据</div>  <div class="ds-tag">❌ 缺失</div>  <div class="ds-meta">需伦理 + 招募 · n=0</div></div><div class="data-status-cell gap">  <div class="ds-name">整合手套硬件原型</div>  <div class="ds-tag">🔧 设计中</div>  <div class="ds-meta">EDA+PPG+IMU+mic · n=0 (ESP32 音频已通)</div></div></div>
+  <div style="font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.6;">
+    详见 <a href="wiki/datasets/external/_external_datasets_registry.md">外部数据集登记</a> ·
+    <a href="wiki/methods/synthetic_data_v1_plan.md">合成数据 v1 校准计划</a> ·
+    <a href="wiki/synthesis/hardware_roadmap.md">硬件路线图</a>
+  </div>
 </section>
 
 <section>
